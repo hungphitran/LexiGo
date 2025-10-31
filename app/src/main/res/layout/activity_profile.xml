@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".activities.ProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header với ảnh đại diện -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="@dimen/spacing_xl"
+            android:background="@color/primary">
+
+            <!-- Avatar -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="@dimen/profile_image_size"
+                android:layout_height="@dimen/profile_image_size"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="@dimen/card_elevation">
+
+                <ImageView
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Avatar"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tên người dùng -->
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:text="Nguyễn Văn A"
+                android:textSize="@dimen/text_size_headline"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
+
+            <!-- Email -->
+            <TextView
+                android:id="@+id/tvUserEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="user@example.com"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/white"
+                android:alpha="0.9"/>
+
+            <!-- Cấp độ -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:text="@string/intermediate"
+                android:textColor="@color/white"
+                app:chipBackgroundColor="@color/intermediate_color"
+                app:chipIcon="@android:drawable/star_on"
+                app:chipIconTint="@color/white"/>
+
+        </LinearLayout>
+
+        <!-- Nội dung chính -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_medium">
+
+            <!-- Thống kê tiến độ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardCornerRadius="@dimen/card_corner_radius">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/statistics"
+                        android:textSize="@dimen/text_size_title"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"/>
+
+                    <!-- Số bài đã học -->
+                    <TextView
+                        android:id="@+id/tvLessonsStatistics"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:text="@string/lessons_statistics"
+                        android:textSize="@dimen/text_size_medium"
+                        android:textColor="@color/text_secondary"/>
+
+                    <!-- Progress Bar -->
+                    <ProgressBar
+                        android:id="@+id/progressLessons"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/progress_height"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:max="100"
+                        android:progress="45"
+                        android:progressTint="@color/progress_complete"
+                        android:progressBackgroundTint="@color/progress_background"/>
+
+                    <TextView
+                        android:id="@+id/tvTotalLessons"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:text="@string/total_lessons"
+                        android:textSize="@dimen/text_size_small"
+                        android:textColor="@color/text_hint"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Các nút chức năng -->
+
+            <!-- Cập nhật thông tin -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdateProfile"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/update_profile"
+                android:textSize="@dimen/text_size_medium"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconGravity="start"
+                app:cornerRadius="@dimen/button_corner_radius"
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+            <!-- Đặt mục tiêu -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSetGoal"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/set_goal"
+                android:textSize="@dimen/text_size_medium"
+                app:icon="@android:drawable/ic_menu_agenda"
+                app:iconGravity="start"
+                app:cornerRadius="@dimen/button_corner_radius"
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+            <!-- Thống kê chi tiết -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDetailedStats"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_large"
+                android:text="@string/statistics"
+                android:textSize="@dimen/text_size_medium"
+                app:icon="@android:drawable/ic_menu_view"
+                app:iconGravity="start"
+                app:cornerRadius="@dimen/button_corner_radius"
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+            <!-- Đăng xuất -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:text="@string/logout"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/white"
+                app:icon="@android:drawable/ic_lock_power_off"
+                app:iconTint="@color/white"
+                app:iconGravity="start"
+                app:cornerRadius="@dimen/button_corner_radius"
+                app:backgroundTint="@color/accent"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
