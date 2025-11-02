@@ -16,6 +16,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.activities.AuthActivity;
+import com.ptithcm.lexigo.api.TokenManager;
+import com.ptithcm.lexigo.api.models.User;
+import com.ptithcm.lexigo.api.models.UserLoginRequest;
+import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
+import com.ptithcm.lexigo.api.responses.LoginResponse;
 
 /**
  * Fragment cho tab Đăng nhập
@@ -95,13 +100,33 @@ public class LoginFragment extends Fragment {
         }
 
         // TODO: Implement actual login logic with backend/Firebase
-        // Giả lập đăng nhập thành công
-        Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+        UserLoginRequest request = new UserLoginRequest(email, password);
 
-        // Chuyển sang màn hình trang chủ
-        if (getActivity() instanceof AuthActivity) {
-            ((AuthActivity) getActivity()).navigateToHome();
-        }
+        LexiGoRepository repository = LexiGoRepository.getInstance(getContext());
+        repository.login(request, new LexiGoRepository.ApiCallback<LoginResponse>() {
+            @Override
+            public void onSuccess(LoginResponse data) {
+                // Lưu token
+                TokenManager tokenManager = TokenManager.getInstance(getContext());
+                tokenManager.saveToken(data.getAccessToken());
+
+                // Lưu thông tin user
+                User user = data.getUser();
+                tokenManager.saveUserInfo(user.getId(), user.getName(), user.getEmail());
+
+                Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                // Chuyển sang màn hình trang chủ
+                if (getActivity() instanceof AuthActivity) {
+                    ((AuthActivity) getActivity()).navigateToHome();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), "Đăng nhập thất bại: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     /**

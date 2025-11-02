@@ -26,7 +26,9 @@
             android:layout_height="@dimen/icon_size_medium"
             android:src="@android:drawable/ic_menu_agenda"
             android:contentDescription="Category Icon"
-            android:tint="@color/primary"/>
+            app:tint="@color/primary"
+            android:background="@drawable/rounded_icon_background"
+            android:padding="8dp"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -63,7 +65,7 @@
             android:layout_height="@dimen/icon_size_small"
             android:src="@android:drawable/ic_menu_more"
             android:contentDescription="More"
-            android:tint="@color/text_hint"
+            app:tint="@color/text_hint"
             android:rotation="270"/>
 
     </LinearLayout>

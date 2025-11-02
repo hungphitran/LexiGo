@@ -15,6 +15,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.activities.AuthActivity;
+import com.ptithcm.lexigo.api.models.Goals;
+import com.ptithcm.lexigo.api.models.UserRegisterRequest;
+import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
+import com.ptithcm.lexigo.api.responses.RegisterResponse;
 
 /**
  * Fragment cho tab Đăng ký
@@ -121,15 +125,36 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
-        // TODO: Implement actual registration logic with backend/Firebase
-        // Giả lập đăng ký thành công
-        Toast.makeText(getContext(), "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
+        // TODO: Implement actual registration logic with backend
 
-        // Chuyển về tab đăng nhập
-        if (getActivity() instanceof AuthActivity) {
-            // Có thể chuyển về tab login hoặc tự động đăng nhập
-            Toast.makeText(getContext(), "Chuyển sang tab đăng nhập...", Toast.LENGTH_SHORT).show();
-        }
+// Tạo request với thông tin cơ bản
+        UserRegisterRequest request = new UserRegisterRequest(fullName, email, password);
+
+        // Hoặc tạo request với đầy đủ thông tin
+        Goals goals = new Goals(20, 2);
+        UserRegisterRequest fullRequest = new UserRegisterRequest(fullName, email, password, "Intermediate", goals);
+
+        // Gọi API
+        LexiGoRepository repository = LexiGoRepository.getInstance(getContext());
+        repository.register(request, new LexiGoRepository.ApiCallback<RegisterResponse>() {
+            @Override
+            public void onSuccess(RegisterResponse data) {
+                String userId = data.getUserId();
+                Toast.makeText(getContext(), "Đăng ký thành công! ID: " + userId, Toast.LENGTH_SHORT).show();
+                // Chuyển về tab đăng nhập
+                if (getActivity() instanceof AuthActivity) {
+                    // Có thể chuyển về tab login hoặc tự động đăng nhập
+                    Toast.makeText(getContext(), "Chuyển sang tab đăng nhập...", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), "Lỗi: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
 }
 
