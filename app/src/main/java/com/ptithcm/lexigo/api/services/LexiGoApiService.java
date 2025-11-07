@@ -1,5 +1,7 @@
 package com.ptithcm.lexigo.api.services;
 
+import com.ptithcm.lexigo.api.models.GrammarExercise;
+import com.ptithcm.lexigo.api.models.GrammarLesson;
 import com.ptithcm.lexigo.api.models.Progress;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.ProgressUpdateRequest;
@@ -8,9 +10,14 @@ import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.models.UserLoginRequest;
 import com.ptithcm.lexigo.api.models.UserRegisterRequest;
 import com.ptithcm.lexigo.api.models.UserUpdateRequest;
+import com.ptithcm.lexigo.api.models.VocabLesson;
+import com.ptithcm.lexigo.api.models.VocabQuiz;
+import com.ptithcm.lexigo.api.models.VocabTopic;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
 import com.ptithcm.lexigo.api.responses.RegisterResponse;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,6 +25,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface LexiGoApiService {
     
@@ -99,5 +107,75 @@ public interface LexiGoApiService {
      */
     @GET("progress/summary/{user_id}")
     Call<ApiResponse<ProgressSummary>> getProgressSummary(@Path("user_id") String userId);
+    
+    
+    // ============ Vocabulary Lessons Endpoints ============
+    
+    /**
+     * Lấy danh sách chủ đề từ vựng
+     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+     * @return ApiResponse<List<VocabTopic>>
+     */
+    @GET("api/v1/lessons/vocab/topics")
+    Call<ApiResponse<List<VocabTopic>>> getVocabTopics(@Query("level") String level);
+    
+    /**
+     * Lấy danh sách từ vựng theo chủ đề
+     * @param topicId ID của chủ đề
+     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+     * @return ApiResponse<List<VocabLesson>>
+     */
+    @GET("api/v1/lessons/vocab/lessons")
+    Call<ApiResponse<List<VocabLesson>>> getVocabLessons(
+            @Query("topic_id") String topicId,
+            @Query("level") String level
+    );
+    
+    /**
+     * Lấy danh sách câu hỏi quiz từ vựng theo chủ đề
+     * @param topicId ID của chủ đề
+     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+     * @return ApiResponse<List<VocabQuiz>>
+     */
+    @GET("api/v1/lessons/vocab/quizzes")
+    Call<ApiResponse<List<VocabQuiz>>> getVocabQuizzes(
+            @Query("topic_id") String topicId,
+            @Query("level") String level
+    );
+    
+    
+    // ============ Grammar Lessons Endpoints ============
+    
+    /**
+     * Lấy danh sách bài học ngữ pháp
+     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+     * @return ApiResponse<List<GrammarLesson>>
+     */
+    @GET("api/v1/lessons/grammar")
+    Call<ApiResponse<List<GrammarLesson>>> getGrammarLessons(@Query("level") String level);
+    
+    /**
+     * Lấy chi tiết bài học ngữ pháp
+     * @param id ID của bài học
+     * @return ApiResponse<GrammarLesson>
+     */
+    @GET("api/v1/lessons/grammar/{id}")
+    Call<ApiResponse<GrammarLesson>> getGrammarLessonDetail(@Path("id") String id);
+    
+    /**
+     * Lấy danh sách bài tập ngữ pháp cho một bài học
+     * @param lessonId ID của bài học (có thể là lesson hoặc grammar_id)
+     * @return ApiResponse<List<GrammarExercise>>
+     */
+    @GET("api/v1/lessons/grammar/exercises")
+    Call<ApiResponse<List<GrammarExercise>>> getGrammarExercises(@Query("lesson") String lessonId);
+
+    /**
+     * Lấy danh sách bài tập ngữ pháp theo grammar_id
+     * @param grammarId ID của điểm ngữ pháp
+     * @return ApiResponse<List<GrammarExercise>>
+     */
+    @GET("api/v1/lessons/grammar/exercises")
+    Call<ApiResponse<List<GrammarExercise>>> getGrammarExercisesByGrammarId(@Query("grammar_id") String grammarId);
 }
 

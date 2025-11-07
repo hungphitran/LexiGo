@@ -103,8 +103,23 @@ public class HomeActivity extends AppCompatActivity {
 
         // Xử lý sự kiện click item
         categoryAdapter.setOnItemClickListener(category -> {
-            Toast.makeText(this, "Đã chọn: " + category.getTitle(), Toast.LENGTH_SHORT).show();
-            // TODO: Mở màn hình chi tiết tương ứng
+            Intent intent = null;
+            String title = category.getTitle();
+            
+            // Điều hướng đến các màn hình tương ứng
+            if (title.equals("Học từ vựng")) {
+                intent = new Intent(this, VocabTopicsActivity.class);
+            } else if (title.equals("Ngữ pháp")) {
+                intent = new Intent(this, GrammarLessonsActivity.class);
+            } else if (title.equals("Luyện nghe")) {
+                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+            } else if (title.equals("Luyện đọc")) {
+                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+            }
+            
+            if (intent != null) {
+                startActivity(intent);
+            }
         });
     }
 

@@ -13,18 +13,36 @@ api/
 │   ├── UserRegisterRequest.java
 │   ├── UserLoginRequest.java
 │   ├── UserUpdateRequest.java
-│   └── ProgressUpdateRequest.java
+│   ├── ProgressUpdateRequest.java
+│   ├── VocabTopic.java              # NEW: Chủ đề từ vựng
+│   ├── VocabLesson.java             # NEW: Bài học từ vựng
+│   ├── VocabQuiz.java               # NEW: Quiz từ vựng
+│   ├── GrammarLesson.java           # NEW: Bài học ngữ pháp
+│   └── GrammarExercise.java         # NEW: Bài tập ngữ pháp
 ├── responses/                       # Response wrappers
 │   ├── ApiResponse.java
 │   ├── LoginResponse.java
 │   └── RegisterResponse.java
 ├── services/                        # Retrofit API interface
-│   └── LexiGoApiService.java
+│   └── LexiGoApiService.java       # Updated: Thêm vocab & grammar endpoints
 ├── repositories/                    # Repository pattern
 │   └── LexiGoRepository.java
 ├── ApiClient.java                   # Retrofit client
 ├── AuthInterceptor.java             # JWT interceptor
 └── TokenManager.java                # Token storage manager
+
+activities/
+├── VocabTopicsActivity.java         # NEW: Danh sách chủ đề từ vựng
+├── VocabLessonsActivity.java        # NEW: Danh sách từ vựng theo chủ đề
+├── VocabQuizActivity.java           # NEW: Quiz từ vựng
+├── GrammarLessonsActivity.java      # NEW: Danh sách bài học ngữ pháp
+└── GrammarLessonDetailActivity.java # NEW: Chi tiết bài học ngữ pháp
+
+adapters/
+├── VocabTopicAdapter.java           # NEW: Adapter cho danh sách chủ đề
+├── VocabLessonAdapter.java          # NEW: Adapter cho danh sách từ vựng
+├── GrammarLessonAdapter.java        # NEW: Adapter cho danh sách ngữ pháp
+└── GrammarExerciseAdapter.java      # NEW: Adapter cho bài tập ngữ pháp
 ```
 
 ## 🚀 Cách sử dụng
@@ -399,6 +417,253 @@ public class LoginActivity extends AppCompatActivity {
 6. **Logout**: Xóa token và chuyển về màn hình login
 7. **Network Check**: Kiểm tra kết nối internet trước khi gọi API
 8. **Loading State**: Hiển thị ProgressBar khi đang gọi API
+
+---
+
+## 📚 Vocabulary & Grammar API Usage
+
+### 1. Lấy danh sách chủ đề từ vựng
+
+```java
+LexiGoApiService apiService = ApiClient.getInstance(context).create(LexiGoApiService.class);
+
+// Lấy tất cả chủ đề
+Call<ApiResponse<List<VocabTopic>>> call = apiService.getVocabTopics(null);
+
+// Hoặc lọc theo level
+Call<ApiResponse<List<VocabTopic>>> call = apiService.getVocabTopics("Beginner");
+
+call.enqueue(new Callback<ApiResponse<List<VocabTopic>>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<List<VocabTopic>>> call, 
+                         Response<ApiResponse<List<VocabTopic>>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            List<VocabTopic> topics = response.body().getData();
+            // Hiển thị danh sách topics
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<List<VocabTopic>>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 2. Lấy danh sách từ vựng theo chủ đề
+
+```java
+String topicId = "66f2a3bd1a2b4c0f1d2e3a45";
+String level = "Beginner"; // Optional
+
+Call<ApiResponse<List<VocabLesson>>> call = apiService.getVocabLessons(topicId, level);
+
+call.enqueue(new Callback<ApiResponse<List<VocabLesson>>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<List<VocabLesson>>> call, 
+                         Response<ApiResponse<List<VocabLesson>>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            List<VocabLesson> lessons = response.body().getData();
+            // Hiển thị danh sách từ vựng
+            for (VocabLesson lesson : lessons) {
+                String word = lesson.getWord();
+                String meaning = lesson.getMeaning();
+                String pronunciation = lesson.getPronunciation();
+                String example = lesson.getExample();
+                // ...
+            }
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<List<VocabLesson>>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 3. Lấy câu hỏi quiz từ vựng
+
+```java
+String topicId = "66f2a3bd1a2b4c0f1d2e3a45";
+
+Call<ApiResponse<List<VocabQuiz>>> call = apiService.getVocabQuizzes(topicId, null);
+
+call.enqueue(new Callback<ApiResponse<List<VocabQuiz>>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<List<VocabQuiz>>> call, 
+                         Response<ApiResponse<List<VocabQuiz>>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            List<VocabQuiz> quizzes = response.body().getData();
+            // Hiển thị quiz
+            for (VocabQuiz quiz : quizzes) {
+                String question = quiz.getQuestion();
+                List<String> options = quiz.getOptions();
+                String correctAnswer = quiz.getCorrectAnswer();
+                String explanation = quiz.getExplanation();
+                // ...
+            }
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<List<VocabQuiz>>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 4. Lấy danh sách bài học ngữ pháp
+
+```java
+// Lấy tất cả bài học
+Call<ApiResponse<List<GrammarLesson>>> call = apiService.getGrammarLessons(null);
+
+// Hoặc lọc theo level
+Call<ApiResponse<List<GrammarLesson>>> call = apiService.getGrammarLessons("Intermediate");
+
+call.enqueue(new Callback<ApiResponse<List<GrammarLesson>>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<List<GrammarLesson>>> call, 
+                         Response<ApiResponse<List<GrammarLesson>>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            List<GrammarLesson> lessons = response.body().getData();
+            // Hiển thị danh sách bài học
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<List<GrammarLesson>>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 5. Lấy chi tiết bài học ngữ pháp
+
+```java
+String lessonId = "66f2a3bd1a2b4c0f1d2e3a45";
+
+Call<ApiResponse<GrammarLesson>> call = apiService.getGrammarLessonDetail(lessonId);
+
+call.enqueue(new Callback<ApiResponse<GrammarLesson>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<GrammarLesson>> call, 
+                         Response<ApiResponse<GrammarLesson>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            GrammarLesson lesson = response.body().getData();
+            
+            String title = lesson.getTitle();
+            String description = lesson.getDescription();
+            String content = lesson.getContent();
+            List<String> rules = lesson.getRules();
+            List<GrammarLesson.Example> examples = lesson.getExamples();
+            String tips = lesson.getTips();
+            
+            // Hiển thị chi tiết bài học
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<GrammarLesson>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 6. Lấy bài tập ngữ pháp
+
+```java
+String lessonId = "66f2a3bd1a2b4c0f1d2e3a45";
+
+Call<ApiResponse<List<GrammarExercise>>> call = apiService.getGrammarExercises(lessonId);
+
+call.enqueue(new Callback<ApiResponse<List<GrammarExercise>>>() {
+    @Override
+    public void onResponse(Call<ApiResponse<List<GrammarExercise>>> call, 
+                         Response<ApiResponse<List<GrammarExercise>>> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            List<GrammarExercise> exercises = response.body().getData();
+            
+            for (GrammarExercise exercise : exercises) {
+                String question = exercise.getQuestion();
+                String exerciseType = exercise.getExerciseType();
+                List<String> options = exercise.getOptions();
+                String correctAnswer = exercise.getCorrectAnswer();
+                String explanation = exercise.getExplanation();
+                String difficulty = exercise.getDifficulty();
+                // ...
+            }
+        }
+    }
+    
+    @Override
+    public void onFailure(Call<ApiResponse<List<GrammarExercise>>> call, Throwable t) {
+        // Xử lý lỗi
+    }
+});
+```
+
+### 📱 Sử dụng Activities đã tạo sẵn
+
+#### Mở màn hình danh sách chủ đề từ vựng:
+```java
+Intent intent = new Intent(context, VocabTopicsActivity.class);
+intent.putExtra("level", "Beginner"); // Optional
+startActivity(intent);
+```
+
+#### Mở màn hình học từ vựng theo chủ đề:
+```java
+Intent intent = new Intent(context, VocabLessonsActivity.class);
+intent.putExtra("topic_id", "66f2a3bd1a2b4c0f1d2e3a45");
+intent.putExtra("topic_name", "Animals");
+intent.putExtra("level", "Beginner"); // Optional
+startActivity(intent);
+```
+
+#### Mở màn hình quiz từ vựng:
+```java
+Intent intent = new Intent(context, VocabQuizActivity.class);
+intent.putExtra("topic_id", "66f2a3bd1a2b4c0f1d2e3a45");
+intent.putExtra("topic_name", "Animals");
+intent.putExtra("level", "Beginner"); // Optional
+startActivity(intent);
+```
+
+#### Mở màn hình danh sách bài học ngữ pháp:
+```java
+Intent intent = new Intent(context, GrammarLessonsActivity.class);
+intent.putExtra("level", "Intermediate"); // Optional
+startActivity(intent);
+```
+
+#### Mở màn hình chi tiết bài học ngữ pháp:
+```java
+Intent intent = new Intent(context, GrammarLessonDetailActivity.class);
+intent.putExtra("lesson_id", "66f2a3bd1a2b4c0f1d2e3a45");
+intent.putExtra("lesson_title", "Present Perfect Tense");
+startActivity(intent);
+```
+
+### 🎨 Models đã tạo
+
+1. **VocabTopic**: Chủ đề từ vựng
+   - id, name, level, description, imageUrl, wordCount
+
+2. **VocabLesson**: Từ vựng
+   - id, word, pronunciation, meaning, example, topicId, level, imageUrl, audioUrl
+
+3. **VocabQuiz**: Câu hỏi quiz từ vựng
+   - id, question, questionType, options, correctAnswer, topicId, level, explanation
+
+4. **GrammarLesson**: Bài học ngữ pháp
+   - id, title, level, description, content, rules, examples, tips, imageUrl
+
+5. **GrammarExercise**: Bài tập ngữ pháp
+   - id, lessonId, question, exerciseType, options, correctAnswer, explanation, difficulty
+
+---
 
 ## 🐛 Debug
 

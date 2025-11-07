@@ -41,6 +41,45 @@
             android:screenOrientation="portrait"
             android:label="@string/profile" />
 
+        <!-- Vocabulary Activities -->
+        <activity
+            android:name=".activities.VocabTopicsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Chủ đề từ vựng" />
+
+        <activity
+            android:name=".activities.VocabLessonsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Bài học từ vựng" />
+
+        <activity
+            android:name=".activities.VocabQuizActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Quiz từ vựng" />
+
+        <!-- Grammar Activities -->
+        <activity
+            android:name=".activities.GrammarLessonsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Bài học ngữ pháp" />
+
+        <activity
+            android:name=".activities.GrammarLessonDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Chi tiết ngữ pháp" />
+
+        <!-- Quiz Activity (Unified for Vocab & Grammar) -->
+        <activity
+            android:name=".activities.QuizActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Quiz" />
+
         <!-- Main Activity (Original) -->
         <activity
             android:name=".MainActivity"
