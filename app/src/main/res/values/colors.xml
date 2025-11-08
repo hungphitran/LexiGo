@@ -26,4 +26,10 @@
     <!-- Progress Colors -->
     <color name="progress_background">#E0E0E0</color>
     <color name="progress_complete">#4CAF50</color>
+
+    <!-- Category Colors -->
+    <color name="vocab_color">#2196F3</color>
+    <color name="grammar_color">#9C27B0</color>
+    <color name="listening_color">#FF9800</color>
+    <color name="reading_color">#4CAF50</color>
 </resources>

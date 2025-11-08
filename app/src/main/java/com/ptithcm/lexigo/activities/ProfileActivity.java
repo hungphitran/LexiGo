@@ -14,9 +14,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.TokenManager;
+import com.ptithcm.lexigo.api.models.Goals;
 import com.ptithcm.lexigo.api.models.Statistics;
 import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
+import com.ptithcm.lexigo.dialogs.SetGoalsDialog;
 
 /**
  * Màn hình thông tin tài khoản người dùng
@@ -145,8 +147,20 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
-                Toast.makeText(ProfileActivity.this,
-                    "Lỗi tải thống kê: " + error, Toast.LENGTH_SHORT).show();
+                // Handle 404 gracefully - user doesn't have statistics yet
+                if (error.contains("404")) {
+                    // Create default empty statistics
+                    userStatistics = new Statistics();
+                    userStatistics.setTotalCompleted(0);
+                    displayUserStatistics();
+                } else {
+                    Toast.makeText(ProfileActivity.this,
+                        "Lỗi tải thống kê: " + error, Toast.LENGTH_SHORT).show();
+                    // Still display default statistics
+                    userStatistics = new Statistics();
+                    userStatistics.setTotalCompleted(0);
+                    displayUserStatistics();
+                }
             }
         });
     }
@@ -234,24 +248,48 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupClickListeners() {
         // Nút Cập nhật thông tin
         btnUpdateProfile.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở màn hình cập nhật thông tin", Toast.LENGTH_SHORT).show();
-            // TODO: Implement update profile screen
+            Intent intent = new Intent(ProfileActivity.this, UpdateProfileActivity.class);
+            startActivity(intent);
         });
 
         // Nút Đặt mục tiêu học tập
         btnSetGoal.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở màn hình đặt mục tiêu", Toast.LENGTH_SHORT).show();
-            // TODO: Implement goal setting dialog/screen
+            showSetGoalsDialog();
         });
 
         // Nút Thống kê chi tiết
         btnDetailedStats.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở màn hình thống kê chi tiết", Toast.LENGTH_SHORT).show();
-            // TODO: Implement detailed statistics screen
+            Intent intent = new Intent(ProfileActivity.this, DetailedStatisticsActivity.class);
+            startActivity(intent);
         });
 
         // Nút Đăng xuất
         btnLogout.setOnClickListener(v -> handleLogout());
+    }
+
+    /**
+     * Hiển thị dialog thiết lập mục tiêu
+     */
+    private void showSetGoalsDialog() {
+        if (currentUser == null) {
+            Toast.makeText(this, "Đang tải thông tin...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SetGoalsDialog dialog = new SetGoalsDialog(this, currentUser, new SetGoalsDialog.GoalsUpdateListener() {
+            @Override
+            public void onGoalsUpdated(Goals goals) {
+                // Cập nhật currentUser với goals mới
+                if (currentUser != null) {
+                    currentUser.setGoals(goals);
+                }
+                Toast.makeText(ProfileActivity.this,
+                    String.format("Mục tiêu: %d từ, %d bài/ngày",
+                        goals.getDailyWords(), goals.getDailyLessons()),
+                    Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialog.show();
     }
 
     /**
@@ -268,6 +306,16 @@ public class ProfileActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload dữ liệu khi quay lại activity (sau khi cập nhật profile)
+        if (tokenManager.isLoggedIn()) {
+            loadUserProfile();
+            loadUserStatistics();
+        }
     }
 
     @Override
