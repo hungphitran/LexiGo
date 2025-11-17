@@ -2,7 +2,7 @@ package com.ptithcm.lexigo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +15,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.adapters.LearningCategoryAdapter;
+import com.ptithcm.lexigo.api.TokenManager;
+import com.ptithcm.lexigo.api.models.ProgressSummary;
+import com.ptithcm.lexigo.api.models.User;
+import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
 import com.ptithcm.lexigo.models.LearningCategory;
 
 import java.util.ArrayList;
@@ -37,27 +41,42 @@ public class HomeActivity extends AppCompatActivity {
     // Adapter
     private LearningCategoryAdapter categoryAdapter;
 
-    // Dữ liệu mẫu
-    private int completedLessons = 15;
-    private int dailyGoalTarget = 5;
-    private int dailyGoalCurrent = 3;
+    // Managers & Repositories
+    private TokenManager tokenManager;
+    private LexiGoRepository repository;
+
+    private int dailyGoalTarget = 5; // Mặc định
+    private int completedLessons = 0;
+    private int dailyGoalCurrent = 0;
+
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Khởi tạo views
+        // Khởi tạo managers & repositories
+        tokenManager = TokenManager.getInstance(this);
+        repository = LexiGoRepository.getInstance(this);
+
         initViews();
 
-        // Thiết lập dữ liệu
-        setupProgressData();
+        // Load user profile để lấy goals
+        loadUserProfile();
 
         // Thiết lập RecyclerView
         setupRecyclerView();
 
         // Thiết lập các sự kiện click
         setupClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh user profile và progress data khi quay lại activity
+        loadUserProfile();
     }
 
     /**
@@ -83,8 +102,106 @@ public class HomeActivity extends AppCompatActivity {
         tvDailyGoal.setText(getString(R.string.daily_goal, dailyGoalCurrent, dailyGoalTarget));
 
         // Cập nhật progress bar
-        int progressPercentage = (dailyGoalCurrent * 100) / dailyGoalTarget;
+
+        int progressPercentage = dailyGoalTarget > 0 ? (dailyGoalCurrent * 100) / dailyGoalTarget : 0;
         progressDaily.setProgress(progressPercentage);
+    }
+
+    /**
+     * Load thông tin user để lấy goals
+     */
+    private void loadUserProfile() {
+        if (!tokenManager.isLoggedIn()) {
+            // Nếu chưa đăng nhập, hiển thị dữ liệu mặc định
+            setupProgressData();
+            return;
+        }
+
+        repository.getProfile(new LexiGoRepository.ApiCallback<>() {
+            @Override
+            public void onSuccess(User user) {
+                currentUser = user;
+
+                // Lấy goals từ user
+                if (user.getGoals() != null) {
+                    dailyGoalTarget = user.getGoals().getDailyLessons();
+                }
+
+                // Sau khi có goals, load progress data
+                loadProgressData();
+            }
+
+            @Override
+            public void onError(String error) {
+                // Nếu lỗi, vẫn load progress với goal mặc định
+                loadProgressData();
+            }
+        });
+    }
+
+    /**
+     * Load dữ liệu tiến độ thực từ API
+     */
+    private void loadProgressData() {
+        String userId = tokenManager.getUserId();
+        if (userId == null) {
+            // Nếu chưa đăng nhập, hiển thị dữ liệu mặc định
+            setupProgressData();
+            return;
+        }
+
+        repository.getProgressSummary(userId, new LexiGoRepository.ApiCallback<>() {
+            @Override
+            public void onSuccess(ProgressSummary progressSummary) {
+                // Cập nhật tổng số bài đã hoàn thành
+                completedLessons = progressSummary.getTotalCompleted();
+
+                // Tính số bài đã học trong ngày dựa trên last_updated
+                dailyGoalCurrent = calculateDailyProgress(progressSummary);
+
+                setupProgressData();
+            }
+
+            @Override
+            public void onError(String error) {
+                // Nếu lỗi, hiển thị dữ liệu mặc định
+                setupProgressData();
+            }
+        });
+    }
+
+    /**
+     * Tính số bài đã học trong ngày
+     * Lưu ý: Hiện tại API không có endpoint riêng cho daily progress
+     * Workaround: Kiểm tra last_updated có phải hôm nay không
+     */
+    private int calculateDailyProgress(ProgressSummary summary) {
+        if (summary == null || summary.getLastUpdated() == null) {
+            return 0;
+        }
+
+        try {
+            // Parse last_updated: "2025-11-12T09:09:51.022000"
+            String lastUpdated = summary.getLastUpdated();
+            String dateOnly = lastUpdated.substring(0, 10); // "2025-11-12"
+
+            // Lấy ngày hôm nay
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+            String today = sdf.format(new java.util.Date());
+
+            // Nếu last_updated là hôm nay, giả định user đã học ít nhất 1 bài
+            if (dateOnly.equals(today)) {
+                // Tạm thời return total_completed % dailyGoalTarget để mô phỏng
+                // Trong thực tế, cần API endpoint riêng cho daily progress
+                int total = summary.getTotalCompleted();
+                return Math.min(total, dailyGoalTarget);
+            }
+
+            return 0;
+        } catch (Exception e) {
+            Log.e("HomeActivity", "Error calculating daily progress", e);
+            return 0;
+        }
     }
 
     /**
@@ -112,7 +229,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (title.equals("Ngữ pháp")) {
                 intent = new Intent(this, GrammarLessonsActivity.class);
             } else if (title.equals("Luyện nghe")) {
-                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, LevelSelectionActivity.class);
             } else if (title.equals("Luyện đọc")) {
                 Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
             }

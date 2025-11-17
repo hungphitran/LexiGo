@@ -17,12 +17,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.ApiClient;
 import com.ptithcm.lexigo.api.models.GrammarExercise;
+import com.ptithcm.lexigo.api.models.Progress;
 import com.ptithcm.lexigo.api.models.VocabQuiz;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.services.LexiGoApiService;
+import com.ptithcm.lexigo.utils.ProgressTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class QuizActivity extends AppCompatActivity {
     public static final String QUIZ_TYPE_GRAMMAR = "grammar";
 
     // UI Components
+    private MaterialToolbar toolbar;
     private CardView cardProgress;
     private TextView tvQuestionNumber, tvScore, tvTimer;
     private ProgressBar horizontalProgress, loadingProgress;
@@ -101,6 +105,11 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        // Setup toolbar
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(quizTitle != null ? quizTitle + " - Quiz" : "Quiz");
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         // Progress card
         cardProgress = findViewById(R.id.card_progress);
         tvQuestionNumber = findViewById(R.id.tv_question_number);
@@ -577,6 +586,9 @@ public class QuizActivity extends AppCompatActivity {
             performanceColor = getResources().getColor(R.color.advanced_color);
         }
 
+        // Tự động cập nhật tiến độ dựa trên loại quiz
+        updateProgressForQuizCompletion();
+
         // Create result dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("🎉 Quiz Completed!");
@@ -600,6 +612,14 @@ public class QuizActivity extends AppCompatActivity {
             btnNext.setVisibility(View.VISIBLE);
         });
 
+        builder.setNeutralButton("Về trang chủ", (dialog, which) -> {
+            // Quay về HomeActivity
+            Intent intent = new Intent(QuizActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
+
         builder.setNegativeButton("Finish", (dialog, which) -> {
             finish();
         });
@@ -617,6 +637,35 @@ public class QuizActivity extends AppCompatActivity {
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         Log.e(TAG, message);
+    }
+
+    /**
+     * Tự động cập nhật tiến độ khi hoàn thành quiz
+     */
+    private void updateProgressForQuizCompletion() {
+        ProgressTracker.ExerciseType exerciseType;
+
+        if (QUIZ_TYPE_VOCAB.equals(quizType)) {
+            exerciseType = ProgressTracker.ExerciseType.VOCAB;
+        } else if (QUIZ_TYPE_GRAMMAR.equals(quizType)) {
+            exerciseType = ProgressTracker.ExerciseType.GRAMMAR;
+        } else {
+            Log.w(TAG, "Unknown quiz type, skipping progress update");
+            return;
+        }
+
+        ProgressTracker.updateProgress(this, exerciseType, new ProgressTracker.ProgressUpdateCallback() {
+            @Override
+            public void onSuccess(Progress progress) {
+                Log.d(TAG, "Progress updated successfully after quiz completion");
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e(TAG, "Failed to update progress: " + message);
+                // Không hiển thị lỗi cho user vì đây là background operation
+            }
+        });
     }
 
     @Override

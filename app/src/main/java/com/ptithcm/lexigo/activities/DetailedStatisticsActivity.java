@@ -31,15 +31,6 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
     private TextView tvReadingCompleted;
     private TextView tvLastUpdated;
 
-    // Progress Summary Views
-    private TextView tvTotalLessons;
-    private TextView tvCompletedLessons;
-    private TextView tvInProgressLessons;
-    private TextView tvTotalQuizzes;
-    private TextView tvCompletedQuizzes;
-    private TextView tvAverageScore;
-    private TextView tvStreak;
-
     private ProgressBar progressTotal;
     private ProgressBar progressVocab;
     private ProgressBar progressGrammar;
@@ -70,6 +61,13 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
 
         // Load dữ liệu
         loadStatistics();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh progress data khi quay lại activity
+        loadStatistics();
         loadProgressSummary();
     }
 
@@ -87,14 +85,6 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
         tvReadingCompleted = findViewById(R.id.tvReadingCompleted);
         tvLastUpdated = findViewById(R.id.tvLastUpdated);
 
-        // Progress Summary
-        tvTotalLessons = findViewById(R.id.tvTotalLessons);
-        tvCompletedLessons = findViewById(R.id.tvCompletedLessons);
-        tvInProgressLessons = findViewById(R.id.tvInProgressLessons);
-        tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
-        tvCompletedQuizzes = findViewById(R.id.tvCompletedQuizzes);
-        tvAverageScore = findViewById(R.id.tvAverageScore);
-        tvStreak = findViewById(R.id.tvStreak);
 
         // Progress bars
         progressTotal = findViewById(R.id.progressTotal);
@@ -105,7 +95,6 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
 
         loadingIndicator = findViewById(R.id.loadingIndicator);
         cardStatistics = findViewById(R.id.cardStatistics);
-        cardProgress = findViewById(R.id.cardProgress);
     }
 
     /**
@@ -173,8 +162,9 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
         repository.getProgressSummary(userId, new LexiGoRepository.ApiCallback<ProgressSummary>() {
             @Override
             public void onSuccess(ProgressSummary summary) {
-                displayProgressSummary(summary);
-                cardProgress.setVisibility(View.VISIBLE);
+                // Hiển thị cả statistics từ progress summary
+                displayStatisticsFromProgress(summary);
+                cardStatistics.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -183,8 +173,9 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
                 if (error.contains("404")) {
                     // Create and display default empty progress summary
                     ProgressSummary defaultSummary = new ProgressSummary();
-                    displayProgressSummary(defaultSummary);
+                    displayStatisticsFromProgress(defaultSummary);
                     cardProgress.setVisibility(View.VISIBLE);
+                    cardStatistics.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(DetailedStatisticsActivity.this,
                             "Lỗi tải tiến độ: " + error, Toast.LENGTH_SHORT).show();
@@ -194,7 +185,64 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Hiển thị thống kê
+     * Hiển thị thống kê từ ProgressSummary
+     */
+    private void displayStatisticsFromProgress(ProgressSummary summary) {
+        if (summary == null) return;
+
+        int total = summary.getTotalCompleted();
+        int vocab = summary.getTotalVocab();
+        int grammar = summary.getTotalGrammar();
+        int listening = summary.getTotalListening();
+        int reading = summary.getTotalReading();
+
+        tvTotalCompleted.setText(String.valueOf(total));
+        tvVocabCompleted.setText(String.format("Từ vựng: %d bài", vocab));
+        tvGrammarCompleted.setText(String.format("Ngữ pháp: %d bài", grammar));
+        tvListeningCompleted.setText(String.format("Nghe: %d bài", listening));
+        tvReadingCompleted.setText(String.format("Đọc: %d bài", reading));
+
+        if (summary.getLastUpdated() != null) {
+            tvLastUpdated.setText(String.format("Cập nhật: %s", summary.getLastUpdated()));
+        } else {
+            tvLastUpdated.setText("Cập nhật: Chưa có");
+        }
+
+        // Cập nhật progress bars
+        int maxValue = Math.max(total, 100); // Giả sử tối đa 100 bài
+        progressTotal.setMax(maxValue);
+        progressTotal.setProgress(total);
+
+        if (total > 0) {
+            progressVocab.setMax(total);
+            progressVocab.setProgress(vocab);
+
+            progressGrammar.setMax(total);
+            progressGrammar.setProgress(grammar);
+
+            progressListening.setMax(total);
+            progressListening.setProgress(listening);
+
+            progressReading.setMax(total);
+            progressReading.setProgress(reading);
+        } else {
+            // Reset về 0 nếu chưa có dữ liệu
+            progressVocab.setMax(100);
+            progressVocab.setProgress(0);
+
+            progressGrammar.setMax(100);
+            progressGrammar.setProgress(0);
+
+            progressListening.setMax(100);
+            progressListening.setProgress(0);
+
+            progressReading.setMax(100);
+            progressReading.setProgress(0);
+        }
+    }
+
+    /**
+     * Hiển thị thống kê (deprecated - use displayStatisticsFromProgress instead)
      */
     private void displayStatistics(Statistics statistics) {
         if (statistics == null) return;
@@ -235,22 +283,6 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Hiển thị tóm tắt tiến độ
-     */
-    private void displayProgressSummary(ProgressSummary summary) {
-        if (summary == null) return;
-
-        tvTotalLessons.setText(String.format("Tổng: %d", summary.getTotalLessons()));
-        tvCompletedLessons.setText(String.format("Hoàn thành: %d", summary.getCompletedLessons()));
-        tvInProgressLessons.setText(String.format("Đang học: %d", summary.getInProgressLessons()));
-
-        tvTotalQuizzes.setText(String.format("Tổng quiz: %d", summary.getTotalQuizzes()));
-        tvCompletedQuizzes.setText(String.format("Đã làm: %d", summary.getCompletedQuizzes()));
-
-        tvAverageScore.setText(String.format("Điểm TB: %.1f%%", summary.getAverageScore()));
-        tvStreak.setText(String.format("%d ngày", summary.getCurrentStreak()));
-    }
 
     /**
      * Hiển thị/ẩn loading indicator

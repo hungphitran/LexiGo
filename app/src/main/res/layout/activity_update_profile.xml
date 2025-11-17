@@ -69,15 +69,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Mục tiêu hàng ngày -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_medium"
-                android:layout_marginBottom="@dimen/spacing_small"
-                android:text="Mục tiêu hàng ngày"
-                android:textSize="@dimen/text_size_title"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"/>
 
             <!-- Số từ vựng mỗi ngày -->
             <com.google.android.material.textfield.TextInputLayout

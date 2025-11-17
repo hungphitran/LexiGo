@@ -96,6 +96,19 @@
             android:screenOrientation="portrait"
             android:label="Quiz" />
 
+        <!-- Listening Activities -->
+        <activity
+            android:name=".activities.LevelSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Chọn cấp độ" />
+
+        <activity
+            android:name=".activities.ListeningExerciseActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Luyện nghe" />
+
         <!-- Main Activity (Original) -->
         <activity
             android:name=".MainActivity"

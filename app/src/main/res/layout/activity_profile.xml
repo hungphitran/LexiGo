@@ -159,17 +159,6 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"/>
 
             <!-- Đặt mục tiêu -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSetGoal"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/button_height"
-                android:layout_marginBottom="@dimen/spacing_small"
-                android:text="@string/set_goal"
-                android:textSize="@dimen/text_size_medium"
-                app:icon="@android:drawable/ic_menu_agenda"
-                app:iconGravity="start"
-                app:cornerRadius="@dimen/button_corner_radius"
-                style="@style/Widget.Material3.Button.OutlinedButton"/>
 
             <!-- Thống kê chi tiết -->
             <com.google.android.material.button.MaterialButton

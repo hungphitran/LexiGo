@@ -15,9 +15,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * API Client để khởi tạo Retrofit và cung cấp API service
  */
 public class ApiClient {
-    private static final String BASE_URL = "https://lexigo-api.fly.dev/";
+//    private static final String BASE_URL = "https://lexigo-api.fly.dev/";
     // Sử dụng BASE_URL_DEV cho development
-//     private static final String BASE_URL = "http://10.0.2.2:8000/";
+     private static final String BASE_URL = "http://10.0.2.2:8000/";
 
     private static ApiClient instance;
     private Retrofit retrofit;

@@ -12,11 +12,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.ApiClient;
+import com.ptithcm.lexigo.api.models.Progress;
 import com.ptithcm.lexigo.api.models.VocabQuiz;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.services.LexiGoApiService;
+import com.ptithcm.lexigo.utils.ProgressTracker;
 
 import java.util.List;
 
@@ -27,6 +30,7 @@ import retrofit2.Response;
 public class VocabQuizActivity extends AppCompatActivity {
     private static final String TAG = "VocabQuizActivity";
     
+    private MaterialToolbar toolbar;
     private TextView tvQuestion, tvQuestionNumber, tvScore, tvExplanation;
     private RadioGroup radioGroup;
     private Button btnSubmit, btnNext;
@@ -61,6 +65,18 @@ public class VocabQuizActivity extends AppCompatActivity {
     }
     
     private void initViews() {
+        // Setup toolbar
+        toolbar = findViewById(R.id.toolbar);
+        if (getIntent() != null) {
+            String topicName = getIntent().getStringExtra("topic_name");
+            if (topicName != null) {
+                toolbar.setTitle(topicName + " - Quiz");
+            } else {
+                toolbar.setTitle("Từ vựng Quiz");
+            }
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         tvQuestionNumber = findViewById(R.id.tv_question_number);
         tvQuestion = findViewById(R.id.tv_question);
         tvScore = findViewById(R.id.tv_score);
@@ -198,6 +214,20 @@ public class VocabQuizActivity extends AppCompatActivity {
         tvExplanation.setText(String.format("Your final score: %d/%d (%.1f%%)", 
                                           score, quizList.size(), percentage));
         tvExplanation.setVisibility(View.VISIBLE);
+
+        // Tự động cập nhật tiến độ học vocab
+        ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.VOCAB,
+            new ProgressTracker.ProgressUpdateCallback() {
+                @Override
+                public void onSuccess(Progress progress) {
+                    Log.d(TAG, "Vocab progress updated successfully");
+                }
+
+                @Override
+                public void onError(String message) {
+                    Log.e(TAG, "Failed to update vocab progress: " + message);
+                }
+            });
     }
     
     private void showError(String message) {

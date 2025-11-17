@@ -15,6 +15,7 @@ import com.google.android.material.chip.Chip;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.TokenManager;
 import com.ptithcm.lexigo.api.models.Goals;
+import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.Statistics;
 import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
@@ -35,7 +36,6 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressBar progressLessons;
     private TextView tvTotalLessons;
     private MaterialButton btnUpdateProfile;
-    private MaterialButton btnSetGoal;
     private MaterialButton btnDetailedStats;
     private MaterialButton btnLogout;
     private ProgressBar loadingIndicator;
@@ -46,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Dữ liệu người dùng
     private User currentUser;
-    private Statistics userStatistics;
+    private ProgressSummary userProgress;
     private int totalLessons = 100; // Tổng số bài học trong hệ thống
 
     @Override
@@ -66,6 +66,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Kiểm tra đăng nhập và load dữ liệu
         checkLoginAndLoadData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh progress data khi quay lại activity
+        if (tokenManager.isLoggedIn()) {
+            loadUserStatistics();
+        }
     }
 
     /**
@@ -99,7 +108,6 @@ public class ProfileActivity extends AppCompatActivity {
         progressLessons = findViewById(R.id.progressLessons);
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
-        btnSetGoal = findViewById(R.id.btnSetGoal);
         btnDetailedStats = findViewById(R.id.btnDetailedStats);
         btnLogout = findViewById(R.id.btnLogout);
         loadingIndicator = findViewById(R.id.loadingIndicator);
@@ -138,27 +146,25 @@ public class ProfileActivity extends AppCompatActivity {
         String userId = tokenManager.getUserId();
         if (userId == null) return;
 
-        repository.getUserStatistics(userId, new LexiGoRepository.ApiCallback<Statistics>() {
+        repository.getProgressSummary(userId, new LexiGoRepository.ApiCallback<ProgressSummary>() {
             @Override
-            public void onSuccess(Statistics statistics) {
-                userStatistics = statistics;
+            public void onSuccess(ProgressSummary progressSummary) {
+                userProgress = progressSummary;
                 displayUserStatistics();
             }
 
             @Override
             public void onError(String error) {
-                // Handle 404 gracefully - user doesn't have statistics yet
+                // Handle 404 gracefully - user doesn't have progress yet
                 if (error.contains("404")) {
-                    // Create default empty statistics
-                    userStatistics = new Statistics();
-                    userStatistics.setTotalCompleted(0);
+                    // Create default empty progress
+                    userProgress = new ProgressSummary();
                     displayUserStatistics();
                 } else {
                     Toast.makeText(ProfileActivity.this,
                         "Lỗi tải thống kê: " + error, Toast.LENGTH_SHORT).show();
-                    // Still display default statistics
-                    userStatistics = new Statistics();
-                    userStatistics.setTotalCompleted(0);
+                    // Still display default progress
+                    userProgress = new ProgressSummary();
                     displayUserStatistics();
                 }
             }
@@ -185,9 +191,9 @@ public class ProfileActivity extends AppCompatActivity {
      * Hiển thị thống kê người dùng
      */
     private void displayUserStatistics() {
-        if (userStatistics == null) return;
+        if (userProgress == null) return;
 
-        int completedLessons = userStatistics.getTotalCompleted();
+        int completedLessons = userProgress.getTotalCompleted();
 
         // Hiển thị số bài đã hoàn thành
         tvLessonsStatistics.setText(getString(R.string.lessons_statistics, completedLessons));
@@ -252,10 +258,6 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Nút Đặt mục tiêu học tập
-        btnSetGoal.setOnClickListener(v -> {
-            showSetGoalsDialog();
-        });
 
         // Nút Thống kê chi tiết
         btnDetailedStats.setOnClickListener(v -> {
@@ -308,15 +310,6 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Reload dữ liệu khi quay lại activity (sau khi cập nhật profile)
-        if (tokenManager.isLoggedIn()) {
-            loadUserProfile();
-            loadUserStatistics();
-        }
-    }
 
     @Override
     public void onBackPressed() {

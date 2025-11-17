@@ -2,9 +2,11 @@ package com.ptithcm.lexigo.api.services;
 
 import com.ptithcm.lexigo.api.models.GrammarExercise;
 import com.ptithcm.lexigo.api.models.GrammarLesson;
+import com.ptithcm.lexigo.api.models.ListeningExercise;
 import com.ptithcm.lexigo.api.models.Progress;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.ProgressUpdateRequest;
+import com.ptithcm.lexigo.api.models.Script;
 import com.ptithcm.lexigo.api.models.Statistics;
 import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.models.UserLoginRequest;
@@ -177,5 +179,24 @@ public interface LexiGoApiService {
      */
     @GET("api/v1/lessons/grammar/exercises")
     Call<ApiResponse<List<GrammarExercise>>> getGrammarExercisesByGrammarId(@Query("grammar_id") String grammarId);
+
+
+    // ============ Listening Endpoints ============
+
+    /**
+     * Lấy danh sách script theo level
+     * @param level Beginner, Intermediate, hoặc Advanced
+     * @return ApiResponse<List<Script>>
+     */
+    @GET("api/v1/lessons/listening/scripts")
+    Call<ApiResponse<List<Script>>> getScripts(@Query("level") String level);
+
+    /**
+     * Lấy bài tập listening theo script_id
+     * @param scriptId ID của script
+     * @return ApiResponse<ListeningExercise>
+     */
+    @GET("api/v1/lessons/listening/exercise")
+    Call<ApiResponse<ListeningExercise>> getListeningExercise(@Query("script_id") String scriptId);
 }
 
