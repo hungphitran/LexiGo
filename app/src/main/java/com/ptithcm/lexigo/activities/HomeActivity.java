@@ -249,25 +249,25 @@ public class HomeActivity extends AppCompatActivity {
         categories.add(new LearningCategory(
             "Học từ vựng",
             "100 từ mới",
-            android.R.drawable.ic_menu_agenda
+            R.drawable.ic_category_vocab
         ));
 
         categories.add(new LearningCategory(
             "Ngữ pháp",
             "50 bài học",
-            android.R.drawable.ic_menu_info_details
+            R.drawable.ic_category_grammar
         ));
 
         categories.add(new LearningCategory(
             "Luyện nghe",
             "30 bài nghe",
-            android.R.drawable.ic_btn_speak_now
+            R.drawable.ic_category_listening
         ));
 
         categories.add(new LearningCategory(
             "Luyện đọc",
             "40 bài đọc",
-            android.R.drawable.ic_menu_view
+            R.drawable.ic_category_reading
         ));
 
         return categories;

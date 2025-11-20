@@ -177,7 +177,7 @@ public class QuizActivity extends AppCompatActivity {
             return;
         }
 
-        Call<ApiResponse<List<VocabQuiz>>> call = apiService.getVocabQuizzes(topicId, level);
+        Call<ApiResponse<List<VocabQuiz>>> call = apiService.getVocabQuizzes(topicId);
         call.enqueue(new Callback<ApiResponse<List<VocabQuiz>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<VocabQuiz>>> call,

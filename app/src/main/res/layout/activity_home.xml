@@ -62,9 +62,11 @@
                     android:layout_marginEnd="@dimen/spacing_small"
                     android:text="@string/account"
                     android:textColor="@color/white"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    app:icon="@android:drawable/ic_menu_myplaces"
-                    app:iconTint="@color/white"/>
+                    app:icon="@drawable/ic_account_custom"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconTint="@color/white"
+                    style="@style/Widget.Material3.Button.TextButton"/>
 
             </LinearLayout>
 
@@ -165,4 +167,3 @@
         app:backgroundTint="@color/accent"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

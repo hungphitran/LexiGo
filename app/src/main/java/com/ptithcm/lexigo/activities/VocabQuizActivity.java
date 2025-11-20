@@ -101,7 +101,7 @@ public class VocabQuizActivity extends AppCompatActivity {
         
         progressBar.setVisibility(View.VISIBLE);
         
-        Call<ApiResponse<List<VocabQuiz>>> call = apiService.getVocabQuizzes(topicId, level);
+        Call<ApiResponse<List<VocabQuiz>>> call = apiService.getVocabQuizzes(topicId);
         call.enqueue(new Callback<ApiResponse<List<VocabQuiz>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<VocabQuiz>>> call, 
@@ -142,9 +142,9 @@ public class VocabQuizActivity extends AppCompatActivity {
         
         VocabQuiz currentQuiz = quizList.get(currentQuestionIndex);
         
-        tvQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + quizList.size());
+        tvQuestionNumber.setText("Câu " + (currentQuestionIndex + 1) + "/" + quizList.size());
         tvQuestion.setText(currentQuiz.getQuestion());
-        tvScore.setText("Score: " + score + "/" + quizList.size());
+        tvScore.setText("Điểm: " + score + "/" + currentQuestionIndex);
         tvExplanation.setVisibility(View.GONE);
         
         // Clear previous options
@@ -170,7 +170,7 @@ public class VocabQuizActivity extends AppCompatActivity {
     private void checkAnswer() {
         int selectedId = radioGroup.getCheckedRadioButtonId();
         if (selectedId == -1) {
-            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng chọn một đáp án", Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -181,16 +181,17 @@ public class VocabQuizActivity extends AppCompatActivity {
         
         if (selectedAnswer.equals(currentQuiz.getCorrectAnswer())) {
             score++;
-            tvScore.setText("Score: " + score + "/" + quizList.size());
-            Toast.makeText(this, "Correct! ✓", Toast.LENGTH_SHORT).show();
+            tvScore.setText("Điểm: " + score + "/" + (currentQuestionIndex + 1));
+            Toast.makeText(this, "Chính xác! ✓", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Wrong! Correct answer: " + currentQuiz.getCorrectAnswer(), 
+            Toast.makeText(this, "Sai rồi! Đáp án đúng: " + currentQuiz.getCorrectAnswer(),
                          Toast.LENGTH_LONG).show();
+            tvScore.setText("Điểm: " + score + "/" + (currentQuestionIndex + 1));
         }
         
         // Show explanation if available
         if (currentQuiz.getExplanation() != null && !currentQuiz.getExplanation().isEmpty()) {
-            tvExplanation.setText("Explanation: " + currentQuiz.getExplanation());
+            tvExplanation.setText("Giải thích: " + currentQuiz.getExplanation());
             tvExplanation.setVisibility(View.VISIBLE);
         }
         
@@ -204,14 +205,14 @@ public class VocabQuizActivity extends AppCompatActivity {
     }
     
     private void showQuizComplete() {
-        tvQuestion.setText("Quiz Complete!");
+        tvQuestion.setText("Hoàn thành bài quiz!");
         tvQuestionNumber.setText("");
         radioGroup.setVisibility(View.GONE);
         btnSubmit.setVisibility(View.GONE);
         btnNext.setVisibility(View.GONE);
         
         double percentage = (double) score / quizList.size() * 100;
-        tvExplanation.setText(String.format("Your final score: %d/%d (%.1f%%)", 
+        tvExplanation.setText(String.format("Điểm số cuối cùng: %d/%d (%.1f%%)",
                                           score, quizList.size(), percentage));
         tvExplanation.setVisibility(View.VISIBLE);
 

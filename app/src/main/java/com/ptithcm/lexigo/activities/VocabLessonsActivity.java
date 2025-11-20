@@ -109,4 +109,22 @@ public class VocabLessonsActivity extends AppCompatActivity {
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Release MediaPlayer when activity is destroyed
+        if (adapter != null) {
+            adapter.releaseMediaPlayer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Release MediaPlayer when activity is paused
+        if (adapter != null) {
+            adapter.releaseMediaPlayer();
+        }
+    }
 }

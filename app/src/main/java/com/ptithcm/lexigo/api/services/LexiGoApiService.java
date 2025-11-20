@@ -136,13 +136,13 @@ public interface LexiGoApiService {
     /**
      * Lấy danh sách câu hỏi quiz từ vựng theo chủ đề
      * @param topicId ID của chủ đề
-     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+//     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
      * @return ApiResponse<List<VocabQuiz>>
      */
     @GET("api/v1/lessons/vocab/quizzes")
     Call<ApiResponse<List<VocabQuiz>>> getVocabQuizzes(
-            @Query("topic_id") String topicId,
-            @Query("level") String level
+            @Query("topic_id") String topicId
+//            @Query("level") String level
     );
     
     

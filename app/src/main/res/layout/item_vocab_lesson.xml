@@ -23,7 +23,8 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@mipmap/ic_launcher"
+                android:contentDescription="Word image" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -35,7 +36,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/tv_word"
@@ -44,15 +46,18 @@
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:textStyle="bold"
+                        android:textColor="@color/primary"
                         android:text="Word" />
 
-                    <ImageView
-                        android:id="@+id/iv_audio"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_lock_silent_mode_off"
-                        android:clickable="true"
-                        android:focusable="true" />
+                    <ImageButton
+                        android:id="@+id/btn_play_audio"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_play_audio"
+                        android:contentDescription="Play pronunciation"
+                        android:scaleType="fitCenter"
+                        android:padding="8dp" />
 
                 </LinearLayout>
 
@@ -63,6 +68,7 @@
                     android:textSize="14sp"
                     android:textStyle="italic"
                     android:layout_marginTop="4dp"
+                    android:visibility="gone"
                     android:text="/pronunciation/" />
 
                 <TextView
@@ -84,6 +90,7 @@
             android:textSize="14sp"
             android:textStyle="italic"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Example sentence" />
 
     </LinearLayout>

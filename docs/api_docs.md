@@ -39,6 +39,31 @@ Prefix: `/api/v1/lessons`
   - Returns list of topics (client-facing)
 - GET `/vocab/lessons?topic={topic_id}&level=...`
   - Returns vocabulary for a topic
+  - Each vocabulary record includes:
+    - `word`: The vocabulary word
+    - `meaning`: Vietnamese translation
+    - `example`: Example sentence (optional)
+    - `image_url`: Image URL (optional)
+    - `audio_url`: **Presigned URL to MP3 pronunciation file** (expires in 3600s)
+  - **Audio Playback**: Use `audio_url` with MediaPlayer to play pronunciation
+  - **Example Response**:
+    ```json
+    {
+      "success": true,
+      "data": [
+        {
+          "_id": "66f2a3bd1a2b4c0f1d2e3a45",
+          "word": "hello",
+          "meaning": "xin chào",
+          "example": "Hello, how are you?",
+          "image_url": "https://example.com/hello.jpg",
+          "audio_url": "https://r2.example.com/vocab/hello.mp3?X-Amz-Expires=3600&...",
+          "level": "Beginner",
+          "topic_id": "66f2a3bd1a2b4c0f1d2e3a44"
+        }
+      ]
+    }
+    ```
 - GET `/vocab/quizzes?topic={topic_id}&level=...`
   - Returns quiz questions for a topic
   - Query params: `topic` (required), `level?` (optional)
@@ -47,6 +72,7 @@ Prefix: `/api/v1/lessons`
   - Required columns: `topic_name`, `word`, `meaning` (or `mean`)
   - Optional columns: `example`, `image_url`, `level` (Beginner/Intermediate/Advanced)
   - Note: `topic_name` must exist in topics collection. The system will look up the topic by name.
+  - Each successful row generates an MP3 pronunciation via Edge TTS (`en-US-GuyNeural`) and uploads it to Cloudflare R2 (`vocab/{slug}.mp3`). Failed TTS/upload rows are logged and returned in `errors`.
   - Requires admin token
 
 Examples:
@@ -54,8 +80,13 @@ Examples:
 # Topics
 curl -X GET http://localhost:8000/api/v1/lessons/vocab/topics
 
-# Vocab by topic
+# Vocab by topic (mỗi từ vựng có audio_url để phát âm thanh)
 curl -X GET "http://localhost:8000/api/v1/lessons/vocab/lessons?topic=66f2a3bd1a2b4c0f1d2e3a45"
+# -> data[].audio_url = presigned Cloudflare R2 URL (hết hạn sau 1h)
+# -> Android: Sử dụng MediaPlayer để phát audio
+# -> MediaPlayer mp = new MediaPlayer();
+# -> mp.setDataSource(audioUrl);
+# -> mp.prepare(); mp.start();
 
 # Quizzes by topic
 curl -X GET "http://localhost:8000/api/v1/lessons/vocab/quizzes?topic=66f2a3bd1a2b4c0f1d2e3a45"
@@ -293,5 +324,4 @@ curl -X GET "http://localhost:8000/api/v1/audio/listening/1624-168623-0000?path=
 - Optional `level` filter supported where indicated: `Beginner|Intermediate|Advanced`.
 - IDs are MongoDB ObjectId strings (except script_id which is a custom string identifier).
 - Audio files are stored in Cloudflare R2. Default file path format: `{script_id}.mp3`.
-
-
+- Vocabulary pronunciations are stored at `vocab/{slug}.mp3`, generated automatically during Excel import via Edge TTS.
