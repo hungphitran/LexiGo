@@ -154,15 +154,15 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Action Button cho Từ điển -->
+    <!-- Floating Action Button cho Chat -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabDictionary"
+        android:id="@+id/fabChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/spacing_medium"
-        android:contentDescription="@string/dictionary"
-        android:src="@android:drawable/ic_menu_search"
+        android:contentDescription="Chat"
+        android:src="@android:drawable/ic_menu_send"
         app:tint="@color/white"
         app:backgroundTint="@color/accent"/>
 

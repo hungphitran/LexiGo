@@ -36,7 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvDailyGoal;
     private ProgressBar progressDaily;
     private RecyclerView rvLearningCategories;
-    private FloatingActionButton fabDictionary;
+    private FloatingActionButton fabChat;
 
     // Adapter
     private LearningCategoryAdapter categoryAdapter;
@@ -88,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
         tvDailyGoal = findViewById(R.id.tvDailyGoal);
         progressDaily = findViewById(R.id.progressDaily);
         rvLearningCategories = findViewById(R.id.rvLearningCategories);
-        fabDictionary = findViewById(R.id.fabDictionary);
+        fabChat = findViewById(R.id.fabChat);
     }
 
     /**
@@ -283,10 +283,10 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Floating Action Button - mở Từ điển
-        fabDictionary.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở từ điển", Toast.LENGTH_SHORT).show();
-            // TODO: Implement dictionary feature
+        // Floating Action Button - mở Chat
+        fabChat.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, ChatActivity.class);
+            startActivity(intent);
         });
     }
 }

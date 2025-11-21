@@ -14,6 +14,13 @@ import com.ptithcm.lexigo.api.models.UserRegisterRequest;
 import com.ptithcm.lexigo.api.models.UserUpdateRequest;
 import com.ptithcm.lexigo.api.models.VocabLesson;
 import com.ptithcm.lexigo.api.models.VocabQuiz;
+import com.ptithcm.lexigo.api.models.ChatEndRequest;
+import com.ptithcm.lexigo.api.models.ChatEndResponse;
+import com.ptithcm.lexigo.api.models.ChatHistoryResponse;
+import com.ptithcm.lexigo.api.models.ChatMessageRequest;
+import com.ptithcm.lexigo.api.models.ChatMessageResponse;
+import com.ptithcm.lexigo.api.models.ChatStartRequest;
+import com.ptithcm.lexigo.api.models.ChatStartResponse;
 import com.ptithcm.lexigo.api.models.VocabTopic;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
@@ -198,5 +205,44 @@ public interface LexiGoApiService {
      */
     @GET("api/v1/lessons/listening/exercise")
     Call<ApiResponse<ListeningExercise>> getListeningExercise(@Query("script_id") String scriptId);
+
+
+    // ============ Chat Endpoints ============
+
+    /**
+     * Bắt đầu cuộc hội thoại mới
+     * @param request ChatStartRequest
+     * @return ApiResponse<ChatStartResponse>
+     */
+    @POST("chat/start")
+    Call<ApiResponse<ChatStartResponse>> startChat(@Body ChatStartRequest request);
+
+    /**
+     * Gửi tin nhắn
+     * @param request ChatMessageRequest
+     * @return ApiResponse<ChatMessageResponse>
+     */
+    @POST("chat/message")
+    Call<ApiResponse<ChatMessageResponse>> sendMessage(@Body ChatMessageRequest request);
+
+    /**
+     * Kết thúc cuộc hội thoại
+     * @param request ChatEndRequest
+     * @return ApiResponse<ChatEndResponse>
+     */
+    @POST("chat/end")
+    Call<ApiResponse<ChatEndResponse>> endChat(@Body ChatEndRequest request);
+
+    /**
+     * Lấy lịch sử hội thoại
+     * @param limit Số lượng cuộc hội thoại (default 10)
+     * @param offset Vị trí bắt đầu (default 0)
+     * @return ApiResponse<ChatHistoryResponse>
+     */
+    @GET("chat/history")
+    Call<ApiResponse<ChatHistoryResponse>> getChatHistory(
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
 }
 

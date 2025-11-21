@@ -97,22 +97,12 @@
             android:label="Quiz" />
 
         <!-- Listening Activities -->
+        <!-- Chat Activity -->
         <activity
-            android:name=".activities.LevelSelectionActivity"
+            android:name=".activities.ChatActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:label="Chọn cấp độ" />
-
-        <activity
-            android:name=".activities.ListeningExerciseActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:label="Luyện nghe" />
-
-        <!-- Main Activity (Original) -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+            android:label="Chat AI" />
 
     </application>
 

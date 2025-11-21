@@ -29,6 +29,58 @@ All responses follow StandardResponse:
 - GET `/progress/summary/{user_id}`
 - POST `/progress/update` (requires auth)
 
+## Chat (AI Conversation Practice)
+- POST `/chat/start` (requires auth)
+  - Start a new conversation with a random topic or specified topic
+  - Body: `{ topic_id?: string }` (optional - if not provided, random topic will be selected)
+  - Returns: `{ conversation_id, topic: { id, name, description }, initial_message }`
+- POST `/chat/message` (requires auth)
+  - Send a message in an active conversation
+  - Body: `{ conversation_id: string, message: string }`
+  - Returns: `{ response: string, conversation_id: string }`
+- POST `/chat/end` (requires auth)
+  - End and save a conversation
+  - Body: `{ conversation_id: string }`
+  - Returns: `{ conversation_id: string, total_messages: number }`
+- GET `/chat/history?limit=10&offset=0` (requires auth)
+  - Get conversation history for the current user
+  - Query params: `limit?` (1-100, default 10), `offset?` (default 0)
+  - Returns: `{ conversations: [...], total: number }`
+
+Examples:
+```bash
+# Start a conversation with random topic
+curl -X POST http://localhost:8000/chat/start \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{}'
+
+# Start a conversation with specific topic
+curl -X POST http://localhost:8000/chat/start \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{"topic_id": "507f1f77bcf86cd799439012"}'
+
+# Send a message
+curl -X POST http://localhost:8000/chat/message \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "conversation_id": "507f1f77bcf86cd799439011",
+    "message": "I wake up at 7 AM every day"
+  }'
+
+# End conversation
+curl -X POST http://localhost:8000/chat/end \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{"conversation_id": "507f1f77bcf86cd799439011"}'
+
+# Get conversation history
+curl -X GET "http://localhost:8000/chat/history?limit=10&offset=0" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
 ## Lessons (Client)
 Prefix: `/api/v1/lessons`
 
@@ -38,32 +90,7 @@ Prefix: `/api/v1/lessons`
 - GET `/vocab/topics?level=Beginner|Intermediate|Advanced`
   - Returns list of topics (client-facing)
 - GET `/vocab/lessons?topic={topic_id}&level=...`
-  - Returns vocabulary for a topic
-  - Each vocabulary record includes:
-    - `word`: The vocabulary word
-    - `meaning`: Vietnamese translation
-    - `example`: Example sentence (optional)
-    - `image_url`: Image URL (optional)
-    - `audio_url`: **Presigned URL to MP3 pronunciation file** (expires in 3600s)
-  - **Audio Playback**: Use `audio_url` with MediaPlayer to play pronunciation
-  - **Example Response**:
-    ```json
-    {
-      "success": true,
-      "data": [
-        {
-          "_id": "66f2a3bd1a2b4c0f1d2e3a45",
-          "word": "hello",
-          "meaning": "xin chào",
-          "example": "Hello, how are you?",
-          "image_url": "https://example.com/hello.jpg",
-          "audio_url": "https://r2.example.com/vocab/hello.mp3?X-Amz-Expires=3600&...",
-          "level": "Beginner",
-          "topic_id": "66f2a3bd1a2b4c0f1d2e3a44"
-        }
-      ]
-    }
-    ```
+  - Returns vocabulary for a topic (mỗi record bao gồm `audio_url` - presigned URL có hạn 3600s)
 - GET `/vocab/quizzes?topic={topic_id}&level=...`
   - Returns quiz questions for a topic
   - Query params: `topic` (required), `level?` (optional)
@@ -80,13 +107,9 @@ Examples:
 # Topics
 curl -X GET http://localhost:8000/api/v1/lessons/vocab/topics
 
-# Vocab by topic (mỗi từ vựng có audio_url để phát âm thanh)
+# Vocab by topic
 curl -X GET "http://localhost:8000/api/v1/lessons/vocab/lessons?topic=66f2a3bd1a2b4c0f1d2e3a45"
 # -> data[].audio_url = presigned Cloudflare R2 URL (hết hạn sau 1h)
-# -> Android: Sử dụng MediaPlayer để phát audio
-# -> MediaPlayer mp = new MediaPlayer();
-# -> mp.setDataSource(audioUrl);
-# -> mp.prepare(); mp.start();
 
 # Quizzes by topic
 curl -X GET "http://localhost:8000/api/v1/lessons/vocab/quizzes?topic=66f2a3bd1a2b4c0f1d2e3a45"
@@ -126,7 +149,7 @@ curl -X POST http://localhost:8000/api/v1/lessons/vocab/import \
   - Returns detailed response with inserted count, skipped count, and error list
 
 ### Vocab Quizzes
-- GET `/vocab/quizzes?topic={topic_id}&level=...`
+- GET `/vocab/quizzes?topic={topic_id}&level=...`  
   - List quizzes by topic
   - Query params: `topic` (required), `level?` (optional)
 - POST `/vocab/quizzes`
@@ -325,3 +348,5 @@ curl -X GET "http://localhost:8000/api/v1/audio/listening/1624-168623-0000?path=
 - IDs are MongoDB ObjectId strings (except script_id which is a custom string identifier).
 - Audio files are stored in Cloudflare R2. Default file path format: `{script_id}.mp3`.
 - Vocabulary pronunciations are stored at `vocab/{slug}.mp3`, generated automatically during Excel import via Edge TTS.
+
+
