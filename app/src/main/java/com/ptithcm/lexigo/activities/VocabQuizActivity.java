@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -21,6 +23,7 @@ import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.services.LexiGoApiService;
 import com.ptithcm.lexigo.utils.ProgressTracker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -38,11 +41,29 @@ public class VocabQuizActivity extends AppCompatActivity {
     
     private LexiGoApiService apiService;
     private List<VocabQuiz> quizList;
+    private List<QuizResult> quizResults; // Track results
     private int currentQuestionIndex = 0;
     private int score = 0;
     
     private String topicId;
     private String level;
+
+    // Inner class to track quiz results
+    private static class QuizResult {
+        String question;
+        String selectedAnswer;
+        String correctAnswer;
+        boolean isCorrect;
+        String explanation;
+
+        QuizResult(String question, String selectedAnswer, String correctAnswer, boolean isCorrect, String explanation) {
+            this.question = question;
+            this.selectedAnswer = selectedAnswer;
+            this.correctAnswer = correctAnswer;
+            this.isCorrect = isCorrect;
+            this.explanation = explanation;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +81,7 @@ public class VocabQuizActivity extends AppCompatActivity {
             }
         }
         
+        quizResults = new ArrayList<>();
         initViews();
         loadQuiz();
     }
@@ -178,8 +200,18 @@ public class VocabQuizActivity extends AppCompatActivity {
         String selectedAnswer = selectedButton.getText().toString();
         
         VocabQuiz currentQuiz = quizList.get(currentQuestionIndex);
+        boolean isCorrect = selectedAnswer.equals(currentQuiz.getCorrectAnswer());
         
-        if (selectedAnswer.equals(currentQuiz.getCorrectAnswer())) {
+        // Track result
+        quizResults.add(new QuizResult(
+            currentQuiz.getQuestion(),
+            selectedAnswer,
+            currentQuiz.getCorrectAnswer(),
+            isCorrect,
+            currentQuiz.getExplanation()
+        ));
+        
+        if (isCorrect) {
             score++;
             tvScore.setText("Điểm: " + score + "/" + (currentQuestionIndex + 1));
             Toast.makeText(this, "Chính xác! ✓", Toast.LENGTH_SHORT).show();
@@ -205,18 +237,7 @@ public class VocabQuizActivity extends AppCompatActivity {
     }
     
     private void showQuizComplete() {
-        tvQuestion.setText("Hoàn thành bài quiz!");
-        tvQuestionNumber.setText("");
-        radioGroup.setVisibility(View.GONE);
-        btnSubmit.setVisibility(View.GONE);
-        btnNext.setVisibility(View.GONE);
-        
-        double percentage = (double) score / quizList.size() * 100;
-        tvExplanation.setText(String.format("Điểm số cuối cùng: %d/%d (%.1f%%)",
-                                          score, quizList.size(), percentage));
-        tvExplanation.setVisibility(View.VISIBLE);
-
-        // Tự động cập nhật tiến độ học vocab
+        // Update progress first
         ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.VOCAB,
             new ProgressTracker.ProgressUpdateCallback() {
                 @Override
@@ -229,6 +250,94 @@ public class VocabQuizActivity extends AppCompatActivity {
                     Log.e(TAG, "Failed to update vocab progress: " + message);
                 }
             });
+        
+        // Show enhanced results dialog
+        showEnhancedResults();
+    }
+    
+    private void showEnhancedResults() {
+        // Inflate custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_quiz_results, null);
+        
+        // Get views
+        TextView tvScore = dialogView.findViewById(R.id.tvScore);
+        TextView tvCorrectCount = dialogView.findViewById(R.id.tvCorrectCount);
+        TextView tvWrongCount = dialogView.findViewById(R.id.tvWrongCount);
+        LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
+        
+        // Calculate score (0-100)
+        int finalScore = (int) ((double) score / quizList.size() * 100);
+        int wrongCount = quizList.size() - score;
+        
+        // Set summary data
+        tvScore.setText(finalScore + "/100");
+        tvCorrectCount.setText(String.valueOf(score));
+        tvWrongCount.setText(String.valueOf(wrongCount));
+        
+        // Add question details
+        for (int i = 0; i < quizResults.size(); i++) {
+            QuizResult result = quizResults.get(i);
+            
+            // Create question detail view
+            LinearLayout questionView = new LinearLayout(this);
+            questionView.setOrientation(LinearLayout.VERTICAL);
+            questionView.setPadding(16, 12, 16, 12);
+            questionView.setBackgroundColor(result.isCorrect ? 
+                getResources().getColor(R.color.beginner_color, null) : 
+                getResources().getColor(R.color.advanced_color, null));
+            questionView.getBackground().setAlpha(30);
+            
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 16);
+            questionView.setLayoutParams(params);
+            
+            // Question title and status
+            TextView tvQuestionStatus = new TextView(this);
+            tvQuestionStatus.setText(String.format("Câu %d: %s", 
+                i + 1, 
+                result.isCorrect ? "✓ Đúng" : "✗ Sai"));
+            tvQuestionStatus.setTextSize(14);
+            tvQuestionStatus.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvQuestionStatus.setTextColor(result.isCorrect ? 
+                getResources().getColor(R.color.beginner_color, null) : 
+                getResources().getColor(R.color.advanced_color, null));
+            questionView.addView(tvQuestionStatus);
+            
+            // Show answer details if wrong
+            if (!result.isCorrect) {
+                TextView tvAnswer = new TextView(this);
+                tvAnswer.setText(String.format("Bạn chọn: %s\nĐáp án đúng: %s", 
+                    result.selectedAnswer, result.correctAnswer));
+                tvAnswer.setTextSize(12);
+                tvAnswer.setTextColor(getResources().getColor(R.color.text_secondary, null));
+                tvAnswer.setPadding(0, 8, 0, 0);
+                questionView.addView(tvAnswer);
+                
+                // Show explanation if available
+                if (result.explanation != null && !result.explanation.isEmpty()) {
+                    TextView tvExplanation = new TextView(this);
+                    tvExplanation.setText("Giải thích: " + result.explanation);
+                    tvExplanation.setTextSize(12);
+                    tvExplanation.setTextColor(getResources().getColor(R.color.text_secondary, null));
+                    tvExplanation.setPadding(0, 4, 0, 0);
+                    tvExplanation.setTypeface(null, android.graphics.Typeface.ITALIC);
+                    questionView.addView(tvExplanation);
+                }
+            }
+            
+            llQuestionDetails.addView(questionView);
+        }
+        
+        // Show dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Kết quả bài làm")
+                .setView(dialogView)
+                .setPositiveButton("Hoàn thành", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
     
     private void showError(String message) {

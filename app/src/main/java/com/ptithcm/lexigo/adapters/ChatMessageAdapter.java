@@ -32,12 +32,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         ChatMessage message = messages.get(position);
         if (message.isUser()) {
             holder.tvUserMessage.setText(message.getMessage());
-            holder.tvUserMessage.setVisibility(View.VISIBLE);
-            holder.tvBotMessage.setVisibility(View.GONE);
+            holder.cardUserMessage.setVisibility(View.VISIBLE);
+            holder.cardBotMessage.setVisibility(View.GONE);
         } else {
             holder.tvBotMessage.setText(message.getMessage());
-            holder.tvBotMessage.setVisibility(View.VISIBLE);
-            holder.tvUserMessage.setVisibility(View.GONE);
+            holder.cardBotMessage.setVisibility(View.VISIBLE);
+            holder.cardUserMessage.setVisibility(View.GONE);
         }
     }
 
@@ -53,11 +53,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserMessage, tvBotMessage;
+        View cardUserMessage, cardBotMessage;
 
         ViewHolder(View itemView) {
             super(itemView);
             tvUserMessage = itemView.findViewById(R.id.tvUserMessage);
             tvBotMessage = itemView.findViewById(R.id.tvBotMessage);
+            cardUserMessage = itemView.findViewById(R.id.cardUserMessage);
+            cardBotMessage = itemView.findViewById(R.id.cardBotMessage);
         }
     }
 }

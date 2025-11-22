@@ -148,6 +148,45 @@ curl -X POST http://localhost:8000/api/v1/lessons/vocab/import \
   - Optional columns: `examples` (separated by newline, `;` or `|`), `level`
   - Returns detailed response with inserted count, skipped count, and error list
 
+### Reading
+- GET `/reading/passages?level=...&tag=...&search=...&page=1&page_size=10`
+  - List short passages for luyện đọc, ordered by publish date.
+  - Query params: `level?`, `tag?`, `search?`, `page?`, `page_size?` (max 50).
+- GET `/reading/passages/{passage_id}`
+  - Get passage detail with `content_blocks`, `glossary`, media links.
+- GET `/reading/passages/{passage_id}/questions`
+  - Fetch MCQ reading comprehension questions (WH-format) for a passage.
+- POST `/reading/passages/{passage_id}/answers`
+  - Body: `{ "answers": [{ "question_id": "<id>", "selected_option": 0 }] }`
+  - Returns correctness breakdown + score (0-100).
+- GET `/reading/dictionary/lookup?word=...&level=...`
+  - Tap-to-translate endpoint. Returns up to 5 dictionary entries (and auto-fallback to vocab lessons if dedicated entry missing).
+
+Examples:
+```bash
+# List passages (Android client)
+curl -X GET "http://localhost:8000/api/v1/reading/passages?level=Beginner&page=1&page_size=10"
+
+# Passage detail
+curl -X GET http://localhost:8000/api/v1/reading/passages/673f048eed3c2b36b6ce01ab
+
+# Fetch MCQs
+curl -X GET http://localhost:8000/api/v1/reading/passages/673f048eed3c2b36b6ce01ab/questions
+
+# Submit answers
+curl -X POST http://localhost:8000/api/v1/reading/passages/673f048eed3c2b36b6ce01ab/answers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "answers": [
+      { "question_id": "67400190f4c7bea88c2461f0", "selected_option": 2 },
+      { "question_id": "674001a0f4c7bea88c2461f2", "selected_option": 1 }
+    ]
+  }'
+
+# Tap-to-translate
+curl -X GET "http://localhost:8000/api/v1/reading/dictionary/lookup?word=curious"
+```
+
 ### Vocab Quizzes
 - GET `/vocab/quizzes?topic={topic_id}&level=...`  
   - List quizzes by topic

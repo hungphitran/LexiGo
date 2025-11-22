@@ -22,6 +22,7 @@ import com.ptithcm.lexigo.api.models.ChatMessageResponse;
 import com.ptithcm.lexigo.api.models.ChatStartRequest;
 import com.ptithcm.lexigo.api.models.ChatStartResponse;
 import com.ptithcm.lexigo.api.models.VocabTopic;
+import com.ptithcm.lexigo.api.models.ReadingPassagesResponse;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
 import com.ptithcm.lexigo.api.responses.RegisterResponse;
@@ -243,6 +244,55 @@ public interface LexiGoApiService {
     Call<ApiResponse<ChatHistoryResponse>> getChatHistory(
             @Query("limit") int limit,
             @Query("offset") int offset
+    );
+
+
+    // ============ Reading Endpoints ============
+
+    /**
+     * Lấy danh sách bài đọc
+     * @param level (Optional) Beginner, Intermediate, hoặc Advanced
+     * @param page Trang (default 1)
+     * @param pageSize Số lượng mục mỗi trang (default 10, max 50)
+     * @return ApiResponse<List<ReadingPassage>>
+     */
+    @GET("api/v1/reading/passages")
+    Call<ApiResponse<ReadingPassagesResponse>> getReadingPassages(
+            @Query("level") String level,
+            @Query("page") int page,
+            @Query("page_size") int pageSize
+    );
+
+    /**
+     * Lấy chi tiết bài đọc
+     * @param passageId ID của bài đọc
+     * @return ApiResponse<ReadingPassage>
+     */
+    @GET("api/v1/reading/passages/{passage_id}")
+    Call<ApiResponse<com.ptithcm.lexigo.api.models.ReadingPassage>> getReadingPassageDetail(
+            @Path("passage_id") String passageId
+    );
+
+    /**
+     * Lấy câu hỏi trắc nghiệm cho bài đọc
+     * @param passageId ID của bài đọc
+     * @return ApiResponse<List<ReadingQuestion>>
+     */
+    @GET("api/v1/reading/passages/{passage_id}/questions")
+    Call<ApiResponse<List<com.ptithcm.lexigo.api.models.ReadingQuestion>>> getReadingQuestions(
+            @Path("passage_id") String passageId
+    );
+
+    /**
+     * Nộp bài trắc nghiệm đọc hiểu
+     * @param passageId ID của bài đọc
+     * @param request ReadingSubmitRequest
+     * @return ApiResponse<ReadingResult>
+     */
+    @POST("api/v1/reading/passages/{passage_id}/answers")
+    Call<ApiResponse<com.ptithcm.lexigo.api.models.ReadingResult>> submitReadingAnswers(
+            @Path("passage_id") String passageId,
+            @Body com.ptithcm.lexigo.api.models.ReadingSubmitRequest request
     );
 }
 

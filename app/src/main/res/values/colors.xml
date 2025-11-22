@@ -11,12 +11,17 @@
 
     <!-- Background Colors -->
     <color name="background">#F5F5F5</color>
+    <color name="background_light">#FAFAFA</color>
     <color name="card_background">#FFFFFF</color>
 
     <!-- Text Colors -->
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#BDBDBD</color>
+
+    <!-- Gray Colors -->
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_dark">#757575</color>
 
     <!-- Level Colors -->
     <color name="beginner_color">#4CAF50</color>

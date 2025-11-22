@@ -97,6 +97,37 @@
             android:label="Quiz" />
 
         <!-- Listening Activities -->
+        <activity
+            android:name=".activities.LevelSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Chọn cấp độ" />
+
+        <activity
+            android:name=".activities.ListeningExerciseActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Bài nghe" />
+
+        <!-- Reading Activities -->
+        <activity
+            android:name=".activities.ReadingPassagesActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Luyện đọc" />
+
+        <activity
+            android:name=".activities.ReadingPassageDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Bài đọc" />
+
+        <activity
+            android:name=".activities.ReadingQuizActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Trắc nghiệm" />
+
         <!-- Chat Activity -->
         <activity
             android:name=".activities.ChatActivity"

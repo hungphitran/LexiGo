@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Item cho RecyclerView trong HomeActivity -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_medium"
-    app:cardElevation="@dimen/card_elevation"
+
+    android:layout_margin="8dp"
+
+    app:cardElevation="6dp"
+    app:cardMaxElevation="6dp"
+
+    app:cardBackgroundColor="@android:color/white"
+
     app:cardCornerRadius="@dimen/card_corner_radius"
     android:clickable="true"
     android:focusable="true"
@@ -19,11 +24,10 @@
         android:padding="@dimen/spacing_medium"
         android:gravity="center_vertical">
 
-        <!-- Icon cho từng mục -->
         <ImageView
             android:id="@+id/imgCategoryIcon"
-            android:layout_width="@dimen/icon_size_medium"
-            android:layout_height="@dimen/icon_size_medium"
+            android:layout_width="@dimen/icon_size_large"
+            android:layout_height="@dimen/icon_size_large"
             android:src="@android:drawable/ic_menu_agenda"
             android:contentDescription="Category Icon"
             app:tint="@color/primary"
@@ -37,7 +41,6 @@
             android:layout_marginStart="@dimen/spacing_medium"
             android:orientation="vertical">
 
-            <!-- Tên mục -->
             <TextView
                 android:id="@+id/tvCategoryTitle"
                 android:layout_width="wrap_content"
@@ -47,7 +50,6 @@
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"/>
 
-            <!-- Mô tả ngắn -->
             <TextView
                 android:id="@+id/tvCategoryDescription"
                 android:layout_width="wrap_content"
@@ -59,7 +61,6 @@
 
         </LinearLayout>
 
-        <!-- Icon mũi tên -->
         <ImageView
             android:layout_width="@dimen/icon_size_small"
             android:layout_height="@dimen/icon_size_small"
@@ -71,4 +72,3 @@
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

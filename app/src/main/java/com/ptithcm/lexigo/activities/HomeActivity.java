@@ -231,7 +231,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (title.equals("Luyện nghe")) {
                 intent = new Intent(this, LevelSelectionActivity.class);
             } else if (title.equals("Luyện đọc")) {
-                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, ReadingPassagesActivity.class);
             }
             
             if (intent != null) {

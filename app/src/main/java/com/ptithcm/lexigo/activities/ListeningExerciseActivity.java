@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -22,6 +24,7 @@ import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.services.LexiGoApiService;
 import com.ptithcm.lexigo.utils.ProgressTracker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -50,6 +53,25 @@ public class ListeningExerciseActivity extends AppCompatActivity {
     private ListeningExercise currentExercise;
     private MediaPlayer mediaPlayer;
     private LexiGoApiService apiService;
+    
+    // Track session results
+    private List<ExerciseResult> sessionResults;
+    private int correctCount = 0;
+
+    // Inner class to track exercise results
+    private static class ExerciseResult {
+        String question; // script with blank
+        String userAnswer;
+        String correctAnswer;
+        boolean isCorrect;
+
+        ExerciseResult(String question, String userAnswer, String correctAnswer, boolean isCorrect) {
+            this.question = question;
+            this.userAnswer = userAnswer;
+            this.correctAnswer = correctAnswer;
+            this.isCorrect = isCorrect;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +84,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
             level = "Beginner";
         }
 
+        sessionResults = new ArrayList<>();
         initViews();
         apiService = ApiClient.getInstance(this).getApiService();
 
@@ -203,7 +226,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
 
         if (currentExerciseIndex >= shuffledScripts.size()) {
             // Đã hoàn thành tất cả bài tập
-            showCompletionMessage();
+            showCompletionResults();
             return;
         }
 
@@ -212,22 +235,102 @@ public class ListeningExerciseActivity extends AppCompatActivity {
     }
 
     /**
-     * Hiển thị thông báo hoàn thành tất cả bài tập
+     * Hiển thị kết quả tổng kết cuối cùng
      */
-    private void showCompletionMessage() {
-        Toast.makeText(this,
-            "🎉 Bạn đã hoàn thành tất cả " + shuffledScripts.size() + " bài tập nghe!",
-            Toast.LENGTH_LONG).show();
+    private void showCompletionResults() {
+        // Update progress first
+        ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.LISTENING,
+            new ProgressTracker.ProgressUpdateCallback() {
+                @Override
+                public void onSuccess(Progress progress) {
+                    Log.d(TAG, "Listening progress updated successfully");
+                }
 
-        // Ẩn các nút Submit và Next, hiển thị nút Home
-        btnSubmit.setVisibility(View.GONE);
-        btnNext.setVisibility(View.GONE);
-        btnHome.setVisibility(View.VISIBLE);
-
-        // Cập nhật text để hiển thị hoàn thành
-        tvScriptWithBlank.setText("Chúc mừng! Bạn đã hoàn thành tất cả bài tập nghe ở cấp độ " + level + "!");
-        tvResult.setVisibility(View.GONE);
-        etAnswer.setVisibility(View.GONE);
+                @Override
+                public void onError(String message) {
+                    Log.e(TAG, "Failed to update listening progress: " + message);
+                }
+            });
+        
+        // Show enhanced results dialog
+        showEnhancedResults();
+    }
+    
+    private void showEnhancedResults() {
+        // Inflate custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_quiz_results, null);
+        
+        // Get views
+        TextView tvScore = dialogView.findViewById(R.id.tvScore);
+        TextView tvCorrectCount = dialogView.findViewById(R.id.tvCorrectCount);
+        TextView tvWrongCount = dialogView.findViewById(R.id.tvWrongCount);
+        LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
+        
+        // Calculate score
+        int totalExercises = sessionResults.size();
+        int finalScore = totalExercises > 0 ? (int) ((double) correctCount / totalExercises * 100) : 0;
+        int wrongCount = totalExercises - correctCount;
+        
+        // Set summary data
+        tvScore.setText(finalScore + "/100");
+        tvCorrectCount.setText(String.valueOf(correctCount));
+        tvWrongCount.setText(String.valueOf(wrongCount));
+        
+        // Add exercise details
+        for (int i = 0; i < sessionResults.size(); i++) {
+            ExerciseResult result = sessionResults.get(i);
+            
+            // Create exercise detail view
+            LinearLayout exerciseView = new LinearLayout(this);
+            exerciseView.setOrientation(LinearLayout.VERTICAL);
+            exerciseView.setPadding(16, 12, 16, 12);
+            exerciseView.setBackgroundColor(result.isCorrect ? 
+                getResources().getColor(R.color.beginner_color, null) : 
+                getResources().getColor(R.color.advanced_color, null));
+            exerciseView.getBackground().setAlpha(30);
+            
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 16);
+            exerciseView.setLayoutParams(params);
+            
+            // Exercise status
+            TextView tvExerciseStatus = new TextView(this);
+            tvExerciseStatus.setText(String.format("Câu %d: %s", 
+                i + 1, 
+                result.isCorrect ? "✓ Đúng" : "✗ Sai"));
+            tvExerciseStatus.setTextSize(14);
+            tvExerciseStatus.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvExerciseStatus.setTextColor(result.isCorrect ? 
+                getResources().getColor(R.color.beginner_color, null) : 
+                getResources().getColor(R.color.advanced_color, null));
+            exerciseView.addView(tvExerciseStatus);
+            
+            // Show answer details
+            TextView tvAnswer = new TextView(this);
+            if (result.isCorrect) {
+                tvAnswer.setText("Câu trả lời: " + result.userAnswer);
+            } else {
+                tvAnswer.setText(String.format("Bạn trả lời: %s\nĐáp án đúng: %s", 
+                    result.userAnswer, result.correctAnswer));
+            }
+            tvAnswer.setTextSize(12);
+            tvAnswer.setTextColor(getResources().getColor(R.color.text_secondary, null));
+            tvAnswer.setPadding(0, 8, 0, 0);
+            exerciseView.addView(tvAnswer);
+            
+            llQuestionDetails.addView(exerciseView);
+        }
+        
+        // Show dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Kết quả bài làm")
+                .setView(dialogView)
+                .setPositiveButton("Hoàn thành", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     /**
@@ -285,9 +388,11 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         tvScriptWithBlank.setText(currentExercise.getScriptWithBlank());
         etAnswer.setText("");
         etAnswer.clearFocus(); // Clear focus from EditText
+        etAnswer.setVisibility(View.VISIBLE);
         tvResult.setVisibility(View.GONE);
         btnSubmit.setEnabled(true);
         btnNext.setVisibility(View.GONE);
+        btnHome.setVisibility(View.GONE);
 
         // Disable và reset button trước khi prepare audio
         btnPlayAudio.setEnabled(false);
@@ -356,8 +461,6 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         }
     }
 
-
-
     /**
      * Phát audio
      */
@@ -400,24 +503,20 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         }
 
         String correctAnswer = currentExercise.getAnswer();
+        boolean isCorrect = userAnswer.equalsIgnoreCase(correctAnswer);
+        
+        // Track result
+        sessionResults.add(new ExerciseResult(
+            currentExercise.getScriptWithBlank(),
+            userAnswer,
+            correctAnswer,
+            isCorrect
+        ));
 
-        if (userAnswer.equalsIgnoreCase(correctAnswer)) {
+        if (isCorrect) {
+            correctCount++;
             tvResult.setText("✓ Chính xác!");
             tvResult.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-
-            // Tự động cập nhật tiến độ khi trả lời đúng
-            ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.LISTENING,
-                new ProgressTracker.ProgressUpdateCallback() {
-                    @Override
-                    public void onSuccess(Progress progress) {
-                        Log.d(TAG, "Listening progress updated successfully");
-                    }
-
-                    @Override
-                    public void onError(String message) {
-                        Log.e(TAG, "Failed to update listening progress: " + message);
-                    }
-                });
         } else {
             tvResult.setText("✗ Sai rồi! Đáp án đúng là: " + correctAnswer);
             tvResult.setTextColor(getResources().getColor(android.R.color.holo_red_dark));

@@ -114,7 +114,7 @@ public class QuizActivity extends AppCompatActivity {
         cardProgress = findViewById(R.id.card_progress);
         tvQuestionNumber = findViewById(R.id.tv_question_number);
         tvScore = findViewById(R.id.tv_score);
-        tvTimer = findViewById(R.id.tv_timer);
+//        tvTimer = findViewById(R.id.tv_timer);
         horizontalProgress = findViewById(R.id.horizontal_progress);
 
         // Loading
