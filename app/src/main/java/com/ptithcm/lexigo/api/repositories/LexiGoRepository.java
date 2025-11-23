@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.ptithcm.lexigo.api.ApiClient;
+import com.ptithcm.lexigo.api.models.DailyProgress;
+import com.ptithcm.lexigo.api.models.DailyProgressResponse;
 import com.ptithcm.lexigo.api.models.Progress;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.ProgressUpdateRequest;
@@ -17,6 +19,8 @@ import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
 import com.ptithcm.lexigo.api.responses.RegisterResponse;
 import com.ptithcm.lexigo.api.services.LexiGoApiService;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -217,10 +221,71 @@ public class LexiGoRepository {
         });
     }
 
+    /**
+     * Lấy tiến độ học theo khoảng thời gian
+     */
+    public void getDailyProgressRange(String userId, String startDate, String endDate,
+                                     ApiCallback<List<DailyProgress>> callback) {
+        apiService.getDailyProgressRange(userId, startDate, endDate).enqueue(
+            new Callback<ApiResponse<DailyProgressResponse>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<DailyProgressResponse>> call,
+                                 @NonNull Response<ApiResponse<DailyProgressResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<DailyProgressResponse> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        // Extract daily_progress list from response
+                        List<DailyProgress> dailyProgressList =
+                            apiResponse.getData().getDailyProgress();
+                        callback.onSuccess(dailyProgressList);
+                    } else {
+                        String errorMsg = apiResponse.getMessage();
+                        if (apiResponse.getDetail() != null) {
+                            errorMsg += ": " + apiResponse.getDetail();
+                        }
+                        callback.onError(errorMsg);
+                    }
+                } else {
+                    callback.onError("HTTP " + response.code() + ": " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<DailyProgressResponse>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    // ============ Dictionary Methods ============
+
+    /**
+     * Tra cứu từ điển Anh-Việt hoặc Việt-Anh
+     * @param word Từ cần tra cứu
+     * @param direction "en-vi" hoặc "vi-en"
+     * @param callback Callback trả về kết quả
+     */
+    public void lookupWord(String word, String direction, ApiCallback<com.ptithcm.lexigo.models.DictionaryEntry> callback) {
+        apiService.lookupWord(word, direction).enqueue(new Callback<ApiResponse<com.ptithcm.lexigo.models.DictionaryEntry>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<com.ptithcm.lexigo.models.DictionaryEntry>> call,
+                                 @NonNull Response<ApiResponse<com.ptithcm.lexigo.models.DictionaryEntry>> response) {
+                handleResponse(response, callback);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<com.ptithcm.lexigo.models.DictionaryEntry>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     // ============ Helper Methods ============
 
     /**
-     * Xử lý response chung
+     * Xử lý response từ API
      */
     private <T> void handleResponse(Response<ApiResponse<T>> response, ApiCallback<T> callback) {
         if (response.isSuccessful() && response.body() != null) {
@@ -247,4 +312,3 @@ public class LexiGoRepository {
         void onError(String error);
     }
 }
-

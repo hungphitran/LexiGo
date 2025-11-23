@@ -22,6 +22,7 @@
     <!-- Gray Colors -->
     <color name="gray_light">#E0E0E0</color>
     <color name="gray_dark">#757575</color>
+    <color name="divider">#E0E0E0</color>
 
     <!-- Level Colors -->
     <color name="beginner_color">#4CAF50</color>

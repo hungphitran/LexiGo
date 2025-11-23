@@ -54,7 +54,7 @@ public class QuizActivity extends AppCompatActivity {
     // UI Components
     private MaterialToolbar toolbar;
     private CardView cardProgress;
-    private TextView tvQuestionNumber, tvScore, tvTimer;
+    private TextView tvQuestionNumber, tvTimer;
     private ProgressBar horizontalProgress, loadingProgress;
     private CardView cardQuestion;
     private TextView tvQuestion, tvQuestionType;
@@ -78,6 +78,7 @@ public class QuizActivity extends AppCompatActivity {
     private String lessonId;
     private String level;
     private String quizTitle;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,7 @@ public class QuizActivity extends AppCompatActivity {
 
         initViews();
         loadQuiz();
+        startTime = System.currentTimeMillis();
     }
 
     private void initViews() {
@@ -113,7 +115,6 @@ public class QuizActivity extends AppCompatActivity {
         // Progress card
         cardProgress = findViewById(R.id.card_progress);
         tvQuestionNumber = findViewById(R.id.tv_question_number);
-        tvScore = findViewById(R.id.tv_score);
 //        tvTimer = findViewById(R.id.tv_timer);
         horizontalProgress = findViewById(R.id.horizontal_progress);
 
@@ -356,8 +357,7 @@ public class QuizActivity extends AppCompatActivity {
         QuizQuestion currentQuestion = quizQuestions.get(currentQuestionIndex);
 
         // Update progress
-        tvQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + quizQuestions.size());
-        tvScore.setText("Score: " + score + "/" + (currentQuestionIndex));
+        tvQuestionNumber.setText("Câu " + (currentQuestionIndex + 1) + "/" + quizQuestions.size());
         horizontalProgress.setMax(quizQuestions.size());
         horizontalProgress.setProgress(currentQuestionIndex + 1);
 
@@ -528,8 +528,6 @@ public class QuizActivity extends AppCompatActivity {
                          Toast.LENGTH_LONG).show();
         }
 
-        // Update score display
-        tvScore.setText("Score: " + score + "/" + ((currentQuestionIndex + 1) * 10));
 
         // Show explanation if available
         if (currentQuestion.getExplanation() != null && !currentQuestion.getExplanation().isEmpty()) {
@@ -644,17 +642,30 @@ public class QuizActivity extends AppCompatActivity {
      */
     private void updateProgressForQuizCompletion() {
         ProgressTracker.ExerciseType exerciseType;
+        String id = null;
 
         if (QUIZ_TYPE_VOCAB.equals(quizType)) {
             exerciseType = ProgressTracker.ExerciseType.VOCAB;
+            id = topicId;
         } else if (QUIZ_TYPE_GRAMMAR.equals(quizType)) {
             exerciseType = ProgressTracker.ExerciseType.GRAMMAR;
+            id = lessonId;
         } else {
             Log.w(TAG, "Unknown quiz type, skipping progress update");
             return;
         }
 
-        ProgressTracker.updateProgress(this, exerciseType, new ProgressTracker.ProgressUpdateCallback() {
+        // Calculate study time in minutes
+        long endTime = System.currentTimeMillis();
+        int studyTimeMinutes = (int) ((endTime - startTime) / 60000);
+        if (studyTimeMinutes < 1) studyTimeMinutes = 1; // Minimum 1 minute
+
+        // Calculate score
+        int totalQuestions = quizQuestions.size();
+        double finalScore = totalQuestions > 0 ? (double) score / (totalQuestions * 10) * 100 : 0;
+
+        ProgressTracker.updateDetailedProgress(this, exerciseType, id, id, finalScore, studyTimeMinutes,
+            new ProgressTracker.ProgressUpdateCallback() {
             @Override
             public void onSuccess(Progress progress) {
                 Log.d(TAG, "Progress updated successfully after quiz completion");

@@ -45,6 +45,9 @@ dependencies {
     implementation libs.okhttp.logging
     implementation libs.gson
 
+    // Charts
+    implementation libs.mpandroidchart
+
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

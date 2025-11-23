@@ -204,6 +204,50 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Đồ thị tiến độ 7 ngày -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProgressChart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:visibility="gone"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardCornerRadius="@dimen/card_corner_radius">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tiến độ 7 ngày qua"
+                        android:textSize="@dimen/text_size_title"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvChartDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:text="Số lượng bài học hoàn thành mỗi ngày"
+                        android:textSize="@dimen/text_size_small"
+                        android:textColor="@color/text_secondary"/>
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="@dimen/spacing_medium"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

@@ -25,9 +25,11 @@ All responses follow StandardResponse:
 - PUT `/user/update` (requires auth)
 
 ## Progress
-- GET `/progress/{user_id}`
-- GET `/progress/summary/{user_id}`
-- POST `/progress/update` (requires auth)
+- GET `/progress/{user_id}` - Get total progress (legacy)
+- GET `/progress/summary/{user_id}` - Get progress summary
+- POST `/progress/update` (requires auth) - Update progress (supports legacy and daily tracking)
+- GET `/progress/daily/{user_id}?date=YYYY-MM-DD` - Get daily progress (default: today)
+- GET `/progress/daily/{user_id}/range?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD` - Get daily progress range
 
 ## Chat (AI Conversation Practice)
 - POST `/chat/start` (requires auth)
@@ -79,6 +81,46 @@ curl -X POST http://localhost:8000/chat/end \
 # Get conversation history
 curl -X GET "http://localhost:8000/chat/history?limit=10&offset=0" \
   -H "Authorization: Bearer <TOKEN>"
+```
+
+## Progress Examples
+
+```bash
+# Update progress (legacy mode - just increment count)
+curl -X POST http://localhost:8000/progress/update \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "vocab_completed": 5,
+    "grammar_completed": 2
+  }'
+
+# Update progress (daily tracking mode - with details)
+curl -X POST http://localhost:8000/progress/update \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "skill_type": "vocab",
+    "lesson_id": "507f1f77bcf86cd799439011",
+    "topic_id": "507f1f77bcf86cd799439012",
+    "score": 85.5,
+    "study_time_minutes": 30
+  }'
+
+# Get total progress (legacy)
+curl -X GET http://localhost:8000/progress/507f1f77bcf86cd799439011
+
+# Get progress summary
+curl -X GET http://localhost:8000/progress/summary/507f1f77bcf86cd799439011
+
+# Get daily progress (today)
+curl -X GET http://localhost:8000/progress/daily/507f1f77bcf86cd799439011
+
+# Get daily progress (specific date)
+curl -X GET "http://localhost:8000/progress/daily/507f1f77bcf86cd799439011?date=2025-01-15"
+
+# Get daily progress range
+curl -X GET "http://localhost:8000/progress/daily/507f1f77bcf86cd799439011/range?start_date=2025-01-01&end_date=2025-01-07"
 ```
 
 ## Lessons (Client)
@@ -187,8 +229,53 @@ curl -X POST http://localhost:8000/api/v1/reading/passages/673f048eed3c2b36b6ce0
 curl -X GET "http://localhost:8000/api/v1/reading/dictionary/lookup?word=curious"
 ```
 
+## Dictionary
+Prefix: `/api/v1/dictionary`
+
+### Dictionary Lookup
+- GET `/dictionary/lookup?word=...&direction=...`
+  - Look up a word in the dictionary with AI-powered generation
+  - Query params: `word` (required), `direction?` (optional: "en-vi" or "vi-en", default "en-vi")
+  - Checks database first, then uses Gemini AI if not found
+  - Automatically saves generated entries to database for future use
+  - Returns: Dictionary entry with word, phonetic, partOfSpeech, definitions, examples, synonyms, translation
+
+Response format:
+```json
+{
+  "success": true,
+  "message": "Dictionary entry retrieved",
+  "data": {
+    "_id": "string",
+    "word": "hello",
+    "phonetic": "/həˈloʊ/",
+    "partOfSpeech": "interjection",
+    "definitions": ["Xin chào", "Lời chào"],
+    "examples": ["Hello, how are you?", "Say hello to your friend"],
+    "synonyms": ["hi", "greetings"],
+    "translation": "Xin chào",
+    "direction": "en-vi",
+    "audio_url": "https://presigned-url-to-audio.mp3"
+  }
+}
+```
+
+Note: Audio is automatically generated using TTS and stored in Cloudflare R2. The `audio_url` is a presigned URL that expires after 1 hour.
+
+Examples:
+```bash
+# Look up English word (English to Vietnamese)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=hello&direction=en-vi"
+
+# Look up Vietnamese word (Vietnamese to English)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=xin%20chào&direction=vi-en"
+
+# Default direction (en-vi)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=curious"
+```
+
 ### Vocab Quizzes
-- GET `/vocab/quizzes?topic={topic_id}&level=...`  
+- GET `/vocab/quizzes?topic={topic_id}&level=...`
   - List quizzes by topic
   - Query params: `topic` (required), `level?` (optional)
 - POST `/vocab/quizzes`
@@ -280,6 +367,26 @@ curl -X POST http://localhost:8000/api/v1/lessons/vocab/quizzes/import \
   -H "Content-Type: multipart/form-data" \
   -H "Authorization: Bearer <ADMIN_TOKEN>" \
   -F "file=@./vocab_quizzes.xlsx"
+```
+
+### Dictionary
+- GET `/dictionary/lookup?word=...&direction=...`
+  - Look up a word in the dictionary with AI-powered generation
+  - Query params: `word` (required), `direction?` (optional: "en-vi" or "vi-en", default "en-vi")
+  - Checks database first, then uses Gemini AI if not found
+  - Automatically saves generated entries to database
+  - Returns: Dictionary entry with word, phonetic, partOfSpeech, definitions, examples, synonyms, translation
+
+Examples:
+```bash
+# Look up English word (English to Vietnamese)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=hello&direction=en-vi"
+
+# Look up Vietnamese word (Vietnamese to English)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=xin%20chào&direction=vi-en"
+
+# Default direction (en-vi)
+curl -X GET "http://localhost:8000/api/v1/dictionary/lookup?word=curious"
 ```
 
 ### Listening

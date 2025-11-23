@@ -232,6 +232,8 @@ public class HomeActivity extends AppCompatActivity {
                 intent = new Intent(this, LevelSelectionActivity.class);
             } else if (title.equals("Luyện đọc")) {
                 intent = new Intent(this, ReadingPassagesActivity.class);
+            } else if (title.equals("Tra cứu từ điển")) {
+                intent = new Intent(this, DictionaryActivity.class);
             }
             
             if (intent != null) {
@@ -268,6 +270,12 @@ public class HomeActivity extends AppCompatActivity {
             "Luyện đọc",
             "40 bài đọc",
             R.drawable.ic_category_reading
+        ));
+
+        categories.add(new LearningCategory(
+            "Tra cứu từ điển",
+            "Tra từ Anh - Việt",
+            R.drawable.ic_category_dictionary
         ));
 
         return categories;

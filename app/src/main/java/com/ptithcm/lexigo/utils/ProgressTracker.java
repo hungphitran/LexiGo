@@ -98,6 +98,83 @@ public class ProgressTracker {
     /**
      * Callback interface cho progress update
      */
+    /**
+     * Cập nhật tiến độ chi tiết (API mới)
+     *
+     * @param context Context
+     * @param exerciseType Loại bài tập
+     * @param lessonId ID bài học/script/passage
+     * @param topicId ID chủ đề (optional)
+     * @param score Điểm số (0-100)
+     * @param studyTimeMinutes Thời gian học (phút)
+     * @param callback Callback
+     */
+    public static void updateDetailedProgress(Context context, ExerciseType exerciseType,
+                                            String lessonId, String topicId,
+                                            double score, int studyTimeMinutes,
+                                            final ProgressUpdateCallback callback) {
+        // Kiểm tra đăng nhập
+        TokenManager tokenManager = TokenManager.getInstance(context);
+        if (!tokenManager.isLoggedIn()) {
+            Log.w(TAG, "User not logged in, skipping progress update");
+            if (callback != null) {
+                callback.onError("User not logged in");
+            }
+            return;
+        }
+
+        ProgressUpdateRequest request = new ProgressUpdateRequest();
+        request.setLessonId(lessonId);
+        request.setTopicId(topicId);
+        request.setScore(score);
+        request.setStudyTimeMinutes(studyTimeMinutes);
+
+        switch (exerciseType) {
+            case VOCAB:
+                request.setSkillType("vocab");
+                break;
+            case GRAMMAR:
+                request.setSkillType("grammar");
+                break;
+            case LISTENING:
+                request.setSkillType("listening");
+                break;
+            case READING:
+                request.setSkillType("reading");
+                break;
+        }
+
+        Log.d(TAG, "Updating detailed progress: " + exerciseType + ", score=" + score);
+
+        // Gọi API update progress
+        LexiGoRepository repository = LexiGoRepository.getInstance(context);
+        repository.updateProgress(request, new LexiGoRepository.ApiCallback<Progress>() {
+            @Override
+            public void onSuccess(Progress data) {
+                Log.d(TAG, "Progress updated successfully: " + exerciseType);
+
+                // Tăng daily progress trong SharedPreferences
+                DailyProgressTracker dailyTracker = DailyProgressTracker.getInstance(context);
+                dailyTracker.incrementDailyProgress();
+
+                if (callback != null) {
+                    callback.onSuccess(data);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e(TAG, "Failed to update progress: " + message);
+                if (callback != null) {
+                    callback.onError(message);
+                }
+            }
+        });
+    }
+
+    /**
+     * Callback interface cho progress update
+     */
     public interface ProgressUpdateCallback {
         void onSuccess(Progress progress);
         void onError(String message);

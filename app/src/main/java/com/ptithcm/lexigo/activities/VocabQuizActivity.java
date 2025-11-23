@@ -34,7 +34,7 @@ public class VocabQuizActivity extends AppCompatActivity {
     private static final String TAG = "VocabQuizActivity";
     
     private MaterialToolbar toolbar;
-    private TextView tvQuestion, tvQuestionNumber, tvScore, tvExplanation;
+    private TextView tvQuestion, tvQuestionNumber, tvExplanation;
     private RadioGroup radioGroup;
     private Button btnSubmit, btnNext;
     private ProgressBar progressBar;
@@ -47,6 +47,7 @@ public class VocabQuizActivity extends AppCompatActivity {
     
     private String topicId;
     private String level;
+    private long startTime;
 
     // Inner class to track quiz results
     private static class QuizResult {
@@ -84,6 +85,7 @@ public class VocabQuizActivity extends AppCompatActivity {
         quizResults = new ArrayList<>();
         initViews();
         loadQuiz();
+        startTime = System.currentTimeMillis();
     }
     
     private void initViews() {
@@ -101,7 +103,6 @@ public class VocabQuizActivity extends AppCompatActivity {
 
         tvQuestionNumber = findViewById(R.id.tv_question_number);
         tvQuestion = findViewById(R.id.tv_question);
-        tvScore = findViewById(R.id.tv_score);
         tvExplanation = findViewById(R.id.tv_explanation);
         radioGroup = findViewById(R.id.radio_group);
         btnSubmit = findViewById(R.id.btn_submit);
@@ -166,7 +167,6 @@ public class VocabQuizActivity extends AppCompatActivity {
         
         tvQuestionNumber.setText("Câu " + (currentQuestionIndex + 1) + "/" + quizList.size());
         tvQuestion.setText(currentQuiz.getQuestion());
-        tvScore.setText("Điểm: " + score + "/" + currentQuestionIndex);
         tvExplanation.setVisibility(View.GONE);
         
         // Clear previous options
@@ -212,13 +212,11 @@ public class VocabQuizActivity extends AppCompatActivity {
         ));
         
         if (isCorrect) {
-            score++;
-            tvScore.setText("Điểm: " + score + "/" + (currentQuestionIndex + 1));
+            score += 10; // 10 points per correct answer
             Toast.makeText(this, "Chính xác! ✓", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Sai rồi! Đáp án đúng: " + currentQuiz.getCorrectAnswer(),
                          Toast.LENGTH_LONG).show();
-            tvScore.setText("Điểm: " + score + "/" + (currentQuestionIndex + 1));
         }
         
         // Show explanation if available
@@ -237,8 +235,18 @@ public class VocabQuizActivity extends AppCompatActivity {
     }
     
     private void showQuizComplete() {
+        // Calculate study time in minutes
+        long endTime = System.currentTimeMillis();
+        int studyTimeMinutes = (int) ((endTime - startTime) / 60000);
+        if (studyTimeMinutes < 1) studyTimeMinutes = 1; // Minimum 1 minute
+
+        // Calculate score (0-100) - score is already in 10-point system
+        int maxScore = quizList.size() * 10;
+        double finalScore = (double) score / maxScore * 100;
+
         // Update progress first
-        ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.VOCAB,
+        ProgressTracker.updateDetailedProgress(this, ProgressTracker.ExerciseType.VOCAB,
+            topicId, topicId, finalScore, studyTimeMinutes,
             new ProgressTracker.ProgressUpdateCallback() {
                 @Override
                 public void onSuccess(Progress progress) {
@@ -266,12 +274,14 @@ public class VocabQuizActivity extends AppCompatActivity {
         LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
         
         // Calculate score (0-100)
-        int finalScore = (int) ((double) score / quizList.size() * 100);
-        int wrongCount = quizList.size() - score;
-        
+        int maxScore = quizList.size() * 10;
+        int correctCount = score / 10; // Convert points back to correct answer count
+        int finalScore = (int) ((double) score / maxScore * 100);
+        int wrongCount = quizList.size() - correctCount;
+
         // Set summary data
         tvScore.setText(finalScore + "/100");
-        tvCorrectCount.setText(String.valueOf(score));
+        tvCorrectCount.setText(String.valueOf(correctCount));
         tvWrongCount.setText(String.valueOf(wrongCount));
         
         // Add question details

@@ -15,6 +15,21 @@ public class ProgressUpdateRequest {
     @SerializedName("reading_completed")
     private Integer readingCompleted;
 
+    @SerializedName("skill_type")
+    private String skillType;
+
+    @SerializedName("lesson_id")
+    private String lessonId;
+
+    @SerializedName("topic_id")
+    private String topicId;
+
+    @SerializedName("score")
+    private Double score;
+
+    @SerializedName("study_time_minutes")
+    private Integer studyTimeMinutes;
+
     public ProgressUpdateRequest() {
     }
 
@@ -48,6 +63,46 @@ public class ProgressUpdateRequest {
 
     public void setReadingCompleted(Integer readingCompleted) {
         this.readingCompleted = readingCompleted;
+    }
+
+    public String getSkillType() {
+        return skillType;
+    }
+
+    public void setSkillType(String skillType) {
+        this.skillType = skillType;
+    }
+
+    public String getLessonId() {
+        return lessonId;
+    }
+
+    public void setLessonId(String lessonId) {
+        this.lessonId = lessonId;
+    }
+
+    public String getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public Integer getStudyTimeMinutes() {
+        return studyTimeMinutes;
+    }
+
+    public void setStudyTimeMinutes(Integer studyTimeMinutes) {
+        this.studyTimeMinutes = studyTimeMinutes;
     }
 }
 

@@ -44,6 +44,7 @@ public class ReadingQuizActivity extends AppCompatActivity {
     private List<ReadingQuestion> questions;
     private List<Integer> userAnswers; // Store selected options
     private int currentQuestionIndex = 0;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class ReadingQuizActivity extends AppCompatActivity {
         }
 
         setupButtons();
+        startTime = System.currentTimeMillis();
     }
 
     private void initViews() {
@@ -233,6 +235,10 @@ public class ReadingQuizActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     ReadingResult result = response.body().getData();
+                    
+                    // Update progress
+                    updateProgress(result);
+                    
                     showResults(result);
                 } else {
                     Toast.makeText(ReadingQuizActivity.this,
@@ -326,5 +332,27 @@ public class ReadingQuizActivity extends AppCompatActivity {
                 .setPositiveButton("Hoàn thành", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
+    }
+    private void updateProgress(ReadingResult result) {
+        // Calculate study time in minutes
+        long endTime = System.currentTimeMillis();
+        int studyTimeMinutes = (int) ((endTime - startTime) / 60000);
+        if (studyTimeMinutes < 1) studyTimeMinutes = 1; // Minimum 1 minute
+
+        // Update progress
+        com.ptithcm.lexigo.utils.ProgressTracker.updateDetailedProgress(this, 
+            com.ptithcm.lexigo.utils.ProgressTracker.ExerciseType.READING,
+            passageId, null, result.getScore(), studyTimeMinutes,
+            new com.ptithcm.lexigo.utils.ProgressTracker.ProgressUpdateCallback() {
+                @Override
+                public void onSuccess(com.ptithcm.lexigo.api.models.Progress progress) {
+                    android.util.Log.d("ReadingQuizActivity", "Reading progress updated successfully");
+                }
+
+                @Override
+                public void onError(String message) {
+                    android.util.Log.e("ReadingQuizActivity", "Failed to update reading progress: " + message);
+                }
+            });
     }
 }

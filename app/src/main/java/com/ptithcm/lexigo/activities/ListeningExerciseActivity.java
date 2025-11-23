@@ -57,6 +57,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
     // Track session results
     private List<ExerciseResult> sessionResults;
     private int correctCount = 0;
+    private long startTime;
 
     // Inner class to track exercise results
     private static class ExerciseResult {
@@ -89,6 +90,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         apiService = ApiClient.getInstance(this).getApiService();
 
         loadScripts();
+        startTime = System.currentTimeMillis();
     }
 
     /**
@@ -238,8 +240,18 @@ public class ListeningExerciseActivity extends AppCompatActivity {
      * Hiển thị kết quả tổng kết cuối cùng
      */
     private void showCompletionResults() {
+        // Calculate study time in minutes
+        long endTime = System.currentTimeMillis();
+        int studyTimeMinutes = (int) ((endTime - startTime) / 60000);
+        if (studyTimeMinutes < 1) studyTimeMinutes = 1; // Minimum 1 minute
+
+        // Calculate score
+        int totalExercises = sessionResults.size();
+        double finalScore = totalExercises > 0 ? (double) correctCount / totalExercises * 100 : 0;
+
         // Update progress first
-        ProgressTracker.updateProgress(this, ProgressTracker.ExerciseType.LISTENING,
+        ProgressTracker.updateDetailedProgress(this, ProgressTracker.ExerciseType.LISTENING,
+            currentScript != null ? currentScript.getScriptId() : null, null, finalScore, studyTimeMinutes,
             new ProgressTracker.ProgressUpdateCallback() {
                 @Override
                 public void onSuccess(Progress progress) {

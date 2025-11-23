@@ -4,6 +4,8 @@ import com.ptithcm.lexigo.api.models.GrammarExercise;
 import com.ptithcm.lexigo.api.models.GrammarLesson;
 import com.ptithcm.lexigo.api.models.ListeningExercise;
 import com.ptithcm.lexigo.api.models.Progress;
+import com.ptithcm.lexigo.api.models.DailyProgress;
+import com.ptithcm.lexigo.api.models.DailyProgressResponse;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.ProgressUpdateRequest;
 import com.ptithcm.lexigo.api.models.Script;
@@ -117,8 +119,34 @@ public interface LexiGoApiService {
      */
     @GET("progress/summary/{user_id}")
     Call<ApiResponse<ProgressSummary>> getProgressSummary(@Path("user_id") String userId);
-    
-    
+
+    /**
+     * Lấy tiến độ học theo ngày
+     * @param userId ID người dùng
+     * @param date Ngày cần lấy (YYYY-MM-DD), mặc định là hôm nay
+     * @return ApiResponse<DailyProgress>
+     */
+    @GET("progress/daily/{user_id}")
+    Call<ApiResponse<DailyProgress>> getDailyProgress(
+            @Path("user_id") String userId,
+            @Query("date") String date
+    );
+
+    /**
+     * Lấy tiến độ học trong khoảng thời gian
+     * @param userId ID người dùng
+     * @param startDate Ngày bắt đầu (YYYY-MM-DD)
+     * @param endDate Ngày kết thúc (YYYY-MM-DD)
+     * @return ApiResponse<DailyProgressResponse>
+     */
+    @GET("progress/daily/{user_id}/range")
+    Call<ApiResponse<DailyProgressResponse>> getDailyProgressRange(
+            @Path("user_id") String userId,
+            @Query("start_date") String startDate,
+            @Query("end_date") String endDate
+    );
+
+
     // ============ Vocabulary Lessons Endpoints ============
     
     /**
@@ -293,6 +321,23 @@ public interface LexiGoApiService {
     Call<ApiResponse<com.ptithcm.lexigo.api.models.ReadingResult>> submitReadingAnswers(
             @Path("passage_id") String passageId,
             @Body com.ptithcm.lexigo.api.models.ReadingSubmitRequest request
+    );
+
+
+    // ============ Dictionary Endpoints ============
+
+    /**
+     * Tra cứu từ điển Anh-Việt hoặc Việt-Anh
+     * Kiểm tra database trước, sau đó sử dụng Gemini AI nếu không tìm thấy
+     * Tự động lưu entries được tạo vào database
+     * @param word Từ cần tra cứu
+     * @param direction "en-vi" (English to Vietnamese) hoặc "vi-en" (Vietnamese to English), default "en-vi"
+     * @return ApiResponse<DictionaryEntry>
+     */
+    @GET("api/v1/dictionary/lookup")
+    Call<ApiResponse<com.ptithcm.lexigo.models.DictionaryEntry>> lookupWord(
+            @Query("word") String word,
+            @Query("direction") String direction
     );
 }
 

@@ -8,13 +8,27 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.TokenManager;
+import com.ptithcm.lexigo.api.models.DailyProgress;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.Statistics;
 import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity hiển thị thống kê chi tiết của người dùng
@@ -39,7 +53,9 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
 
     private ProgressBar loadingIndicator;
     private MaterialCardView cardStatistics;
-    private MaterialCardView cardProgress;
+    private MaterialCardView cardProgressChart;
+    private LineChart lineChart;
+    private TextView tvChartDescription;
 
     private TokenManager tokenManager;
     private LexiGoRepository repository;
@@ -69,6 +85,7 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
         // Refresh progress data khi quay lại activity
         loadStatistics();
         loadProgressSummary();
+        loadDailyProgressChart();
     }
 
     /**
@@ -95,6 +112,9 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
 
         loadingIndicator = findViewById(R.id.loadingIndicator);
         cardStatistics = findViewById(R.id.cardStatistics);
+        cardProgressChart = findViewById(R.id.cardProgressChart);
+        lineChart = findViewById(R.id.lineChart);
+        tvChartDescription = findViewById(R.id.tvChartDescription);
     }
 
     /**
@@ -174,7 +194,6 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
                     // Create and display default empty progress summary
                     ProgressSummary defaultSummary = new ProgressSummary();
                     displayStatisticsFromProgress(defaultSummary);
-                    cardProgress.setVisibility(View.VISIBLE);
                     cardStatistics.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(DetailedStatisticsActivity.this,
@@ -291,6 +310,172 @@ public class DetailedStatisticsActivity extends AppCompatActivity {
         if (loadingIndicator != null) {
             loadingIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+    }
+
+    /**
+     * Load tiến độ 7 ngày qua và hiển thị đồ thị
+     */
+    private void loadDailyProgressChart() {
+        String userId = tokenManager.getUserId();
+        if (userId == null) return;
+
+        // Tính toán ngày bắt đầu và kết thúc (7 ngày qua)
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        Calendar calendar = Calendar.getInstance();
+
+        String endDate = dateFormat.format(calendar.getTime());
+        calendar.add(Calendar.DAY_OF_MONTH, -6); // 7 ngày (bao gồm hôm nay)
+        String startDate = dateFormat.format(calendar.getTime());
+
+        repository.getDailyProgressRange(userId, startDate, endDate,
+            new LexiGoRepository.ApiCallback<List<DailyProgress>>() {
+            @Override
+            public void onSuccess(List<DailyProgress> dailyProgressList) {
+                if (dailyProgressList != null && !dailyProgressList.isEmpty()) {
+                    setupLineChart(dailyProgressList);
+                    cardProgressChart.setVisibility(View.VISIBLE);
+                } else {
+                    // Không có dữ liệu, tạo dữ liệu rỗng cho 7 ngày
+                    List<DailyProgress> emptyData = createEmptyDailyProgress(startDate, endDate);
+                    setupLineChart(emptyData);
+                    cardProgressChart.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                // Xử lý lỗi - tạo dữ liệu rỗng
+                List<DailyProgress> emptyData = createEmptyDailyProgress(startDate, endDate);
+                setupLineChart(emptyData);
+                cardProgressChart.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * Tạo dữ liệu rỗng cho các ngày không có progress
+     */
+    private List<DailyProgress> createEmptyDailyProgress(String startDate, String endDate) {
+        List<DailyProgress> emptyList = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateFormat.parse(startDate));
+            Calendar endCalendar = Calendar.getInstance();
+            endCalendar.setTime(dateFormat.parse(endDate));
+
+            while (!calendar.after(endCalendar)) {
+                DailyProgress dp = new DailyProgress();
+                dp.setDate(dateFormat.format(calendar.getTime()));
+
+                // Initialize empty skill progress objects (all zeros)
+                DailyProgress.SkillProgress emptySkill = new DailyProgress.SkillProgress();
+                emptySkill.setTotalLessons(0);
+
+                dp.setVocab(emptySkill);
+                dp.setGrammar(emptySkill);
+                dp.setListening(emptySkill);
+                dp.setReading(emptySkill);
+
+                emptyList.add(dp);
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return emptyList;
+    }
+
+    /**
+     * Thiết lập đồ thị đường cho tiến độ hàng ngày
+     */
+    private void setupLineChart(List<DailyProgress> dailyProgressList) {
+        if (lineChart == null || dailyProgressList == null) return;
+
+        // Chuẩn bị dữ liệu
+        ArrayList<Entry> entries = new ArrayList<>();
+        final ArrayList<String> dateLabels = new ArrayList<>();
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM", Locale.US);
+
+        for (int i = 0; i < dailyProgressList.size(); i++) {
+            DailyProgress dp = dailyProgressList.get(i);
+            entries.add(new Entry(i, dp.getTotalCount()));
+
+            // Format date label
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(inputFormat.parse(dp.getDate()));
+                dateLabels.add(outputFormat.format(cal.getTime()));
+            } catch (Exception e) {
+                dateLabels.add(dp.getDate());
+            }
+        }
+
+        // Tạo dataset
+        LineDataSet dataSet = new LineDataSet(entries, "Số bài học");
+        dataSet.setColor(getResources().getColor(R.color.primary, null));
+        dataSet.setCircleColor(getResources().getColor(R.color.primary, null));
+        dataSet.setCircleRadius(4f);
+        dataSet.setCircleHoleRadius(2f);
+        dataSet.setLineWidth(2f);
+        dataSet.setValueTextSize(10f);
+        dataSet.setValueTextColor(getResources().getColor(R.color.text_primary, null));
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(getResources().getColor(R.color.primary, null));
+        dataSet.setFillAlpha(30);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Đường cong mượt
+
+        LineData lineData = new LineData(dataSet);
+        lineChart.setData(lineData);
+
+        // Customize chart
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setDrawGridBackground(false);
+        lineChart.setTouchEnabled(true);
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(false);
+        lineChart.setPinchZoom(false);
+        lineChart.setExtraBottomOffset(10f);
+
+        // Customize X-axis
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setTextColor(getResources().getColor(R.color.text_secondary, null));
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value;
+                if (index >= 0 && index < dateLabels.size()) {
+                    return dateLabels.get(index);
+                }
+                return "";
+            }
+        });
+
+        // Customize left Y-axis
+        YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setGridColor(getResources().getColor(R.color.divider, null));
+        leftAxis.setTextColor(getResources().getColor(R.color.text_secondary, null));
+        leftAxis.setGranularity(1f);
+        leftAxis.setAxisMinimum(0f);
+
+        // Disable right Y-axis
+        lineChart.getAxisRight().setEnabled(false);
+
+        // Customize legend
+        lineChart.getLegend().setEnabled(true);
+        lineChart.getLegend().setTextColor(getResources().getColor(R.color.text_primary, null));
+        lineChart.getLegend().setTextSize(12f);
+
+        // Animate chart
+        lineChart.animateX(1000);
+        lineChart.invalidate();
     }
 }
 
