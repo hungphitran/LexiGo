@@ -15,6 +15,10 @@ import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.models.UserLoginRequest;
 import com.ptithcm.lexigo.api.models.UserRegisterRequest;
 import com.ptithcm.lexigo.api.models.UserUpdateRequest;
+import com.ptithcm.lexigo.api.models.ChangePasswordRequest;
+import com.ptithcm.lexigo.api.models.ForgotPasswordRequest;
+import com.ptithcm.lexigo.api.models.VerifyOtpRequest;
+import com.ptithcm.lexigo.api.models.ResetPasswordRequest;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
 import com.ptithcm.lexigo.api.responses.RegisterResponse;
@@ -97,6 +101,82 @@ public class LexiGoRepository {
 
             @Override
             public void onFailure(@NonNull Call<ApiResponse<User>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Đổi mật khẩu
+     */
+    public void changePassword(ChangePasswordRequest request, ApiCallback<Void> callback) {
+        apiService.changePassword(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<Void>> call,
+                                 @NonNull Response<ApiResponse<Void>> response) {
+                handleResponse(response, callback);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<Void>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Gửi OTP quên mật khẩu
+     */
+    public void forgotPassword(ForgotPasswordRequest request, ApiCallback<Void> callback) {
+        apiService.forgotPassword(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<Void>> call,
+                                 @NonNull Response<ApiResponse<Void>> response) {
+                handleResponse(response, callback);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<Void>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Xác thực OTP
+     */
+    public void verifyOtp(VerifyOtpRequest request, ApiCallback<Void> callback) {
+        apiService.verifyOtp(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<Void>> call,
+                                 @NonNull Response<ApiResponse<Void>> response) {
+                handleResponse(response, callback);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<Void>> call,
+                                @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Reset mật khẩu với OTP
+     */
+    public void resetPassword(ResetPasswordRequest request, ApiCallback<Void> callback) {
+        apiService.resetPassword(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<Void>> call,
+                                 @NonNull Response<ApiResponse<Void>> response) {
+                handleResponse(response, callback);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<Void>> call,
                                 @NonNull Throwable t) {
                 callback.onError(t.getMessage());
             }

@@ -50,6 +50,20 @@
             android:screenOrientation="portrait"
             android:label="Cập nhật thông tin" />
 
+        <!-- Change Password Activity -->
+        <activity
+            android:name=".activities.ChangePasswordActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Đổi mật khẩu" />
+
+        <!-- Forgot Password Activity -->
+        <activity
+            android:name=".activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:label="Quên mật khẩu" />
+
         <!-- Detailed Statistics Activity -->
         <activity
             android:name=".activities.DetailedStatisticsActivity"

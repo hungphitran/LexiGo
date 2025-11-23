@@ -36,6 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressBar progressLessons;
     private TextView tvTotalLessons;
     private MaterialButton btnUpdateProfile;
+    private MaterialButton btnChangePassword;
     private MaterialButton btnDetailedStats;
     private MaterialButton btnLogout;
     private ProgressBar loadingIndicator;
@@ -108,6 +109,7 @@ public class ProfileActivity extends AppCompatActivity {
         progressLessons = findViewById(R.id.progressLessons);
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
+        btnChangePassword = findViewById(R.id.btnChangePassword);
         btnDetailedStats = findViewById(R.id.btnDetailedStats);
         btnLogout = findViewById(R.id.btnLogout);
         loadingIndicator = findViewById(R.id.loadingIndicator);
@@ -258,6 +260,11 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Nút Đổi mật khẩu
+        btnChangePassword.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
+            startActivity(intent);
+        });
 
         // Nút Thống kê chi tiết
         btnDetailedStats.setOnClickListener(v -> {

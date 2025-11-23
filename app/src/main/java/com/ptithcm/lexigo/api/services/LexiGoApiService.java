@@ -25,6 +25,10 @@ import com.ptithcm.lexigo.api.models.ChatStartRequest;
 import com.ptithcm.lexigo.api.models.ChatStartResponse;
 import com.ptithcm.lexigo.api.models.VocabTopic;
 import com.ptithcm.lexigo.api.models.ReadingPassagesResponse;
+import com.ptithcm.lexigo.api.models.ChangePasswordRequest;
+import com.ptithcm.lexigo.api.models.ForgotPasswordRequest;
+import com.ptithcm.lexigo.api.models.VerifyOtpRequest;
+import com.ptithcm.lexigo.api.models.ResetPasswordRequest;
 import com.ptithcm.lexigo.api.responses.ApiResponse;
 import com.ptithcm.lexigo.api.responses.LoginResponse;
 import com.ptithcm.lexigo.api.responses.RegisterResponse;
@@ -66,7 +70,39 @@ public interface LexiGoApiService {
     @GET("auth/profile")
     Call<ApiResponse<User>> getProfile();
     
-    
+    /**
+     * Đổi mật khẩu (yêu cầu token)
+     * @param request ChangePasswordRequest
+     * @return ApiResponse<Void>
+     */
+    @POST("auth/change-password")
+    Call<ApiResponse<Void>> changePassword(@Body ChangePasswordRequest request);
+
+    /**
+     * Gửi OTP quên mật khẩu
+     * @param request ForgotPasswordRequest
+     * @return ApiResponse<Void>
+     */
+    @POST("auth/forgot-password")
+    Call<ApiResponse<Void>> forgotPassword(@Body ForgotPasswordRequest request);
+
+    /**
+     * Xác thực OTP
+     * @param request VerifyOtpRequest
+     * @return ApiResponse<Void>
+     */
+    @POST("auth/verify-otp")
+    Call<ApiResponse<Void>> verifyOtp(@Body VerifyOtpRequest request);
+
+    /**
+     * Reset mật khẩu với OTP
+     * @param request ResetPasswordRequest
+     * @return ApiResponse<Void>
+     */
+    @POST("auth/reset-password")
+    Call<ApiResponse<Void>> resetPassword(@Body ResetPasswordRequest request);
+
+
     // ============ User Management Endpoints ============
     
     /**

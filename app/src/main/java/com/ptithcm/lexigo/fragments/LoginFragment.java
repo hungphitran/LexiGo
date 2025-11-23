@@ -1,5 +1,6 @@
 package com.ptithcm.lexigo.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -133,8 +134,8 @@ public class LoginFragment extends Fragment {
      * Xử lý quên mật khẩu
      */
     private void handleForgotPassword() {
-        Toast.makeText(getContext(), "Chức năng quên mật khẩu đang được phát triển", Toast.LENGTH_SHORT).show();
-        // TODO: Implement forgot password functionality
+        Intent intent = new Intent(getActivity(), com.ptithcm.lexigo.activities.ForgotPasswordActivity.class);
+        startActivity(intent);
     }
 }
 
