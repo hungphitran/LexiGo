@@ -108,6 +108,7 @@
                         android:orientation="vertical"
                         android:padding="20dp">
 
+                        <!-- Header statistics -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -130,35 +131,24 @@
                                 android:textStyle="bold"/>
                         </LinearLayout>
 
+                        <!-- Completed lessons only -->
                         <TextView
                             android:id="@+id/tvLessonsStatistics"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="Đã hoàn thành 45% khóa học"
+                            android:text="Đã học: 0"
                             android:textSize="14sp"
                             android:textColor="@color/text_secondary"/>
 
-                        <com.google.android.material.progressindicator.LinearProgressIndicator
-                            android:id="@+id/progressLessons"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            app:trackCornerRadius="8dp"
-                            app:trackThickness="8dp"
-                            app:trackColor="#F0F0F0"
-                            app:indicatorColor="@color/primary"
-                            android:progress="45"/>
-
                         <TextView
-                            android:id="@+id/tvTotalLessons"
+                            android:id="@+id/tvDailyGoalStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Tổng số bài: 45/100"
+                            android:layout_marginTop="6dp"
+                            android:text="Tiến độ ngày: 0/0 bài"
                             android:textSize="12sp"
-                            android:textColor="@color/text_hint"
-                            android:layout_gravity="end"/>
+                            android:textColor="@color/text_hint"/>
 
                     </LinearLayout>
 

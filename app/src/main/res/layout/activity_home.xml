@@ -121,38 +121,16 @@
                             android:textColor="@color/text_primary"
                             android:textStyle="bold"/>
 
-                        <TextView
-                            android:id="@+id/tvPercent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="60%"
-                            android:textSize="18sp"
-                            android:textColor="@color/primary"
-                            android:textStyle="bold"/>
                     </LinearLayout>
 
-                    <ProgressBar
-                        android:id="@+id/progressDaily"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="10dp"
-                        android:progressDrawable="@drawable/custom_rounded_progress_bar"
-                        android:scaleY="1.5"
-                        android:max="100"
-                        android:progress="60"
-                        android:progressTint="@color/primary"
-                        android:progressBackgroundTint="#E0E0E0"
-                        android:layout_marginBottom="12dp"/>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:orientation="vertical">
 
                             <TextView
@@ -166,34 +144,20 @@
                                 android:id="@+id/tvLessonsCompleted"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="12 bài"
+                                android:text="0 bài"
                                 android:textSize="14sp"
                                 android:textColor="@color/text_primary"
                                 android:textStyle="bold"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/tvDailyStatus"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Mục tiêu ngày"
+                                android:layout_marginTop="4dp"
+                                android:text="Tiến độ ngày: 0/0 bài"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_secondary"/>
 
-                            <TextView
-                                android:id="@+id/tvDailyGoal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="20 bài"
-                                android:textSize="14sp"
-                                android:textColor="@color/text_primary"
-                                android:textStyle="bold"/>
                         </LinearLayout>
 
                     </LinearLayout>

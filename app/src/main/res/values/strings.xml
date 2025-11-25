@@ -8,9 +8,12 @@
     <string name="listening">Luyện nghe</string>
     <string name="reading">Luyện đọc</string>
     <string name="progress_title">Tiến độ học tập</string>
-    <string name="lessons_completed">Bài đã hoàn thành: %d</string>
-    <string name="daily_goal">Mục tiêu hôm nay: %d/%d bài</string>
+    <string name="lessons_completed">Hoàn thành: %d</string>
+    <string name="daily_goal">Mục tiêu: %d/%d bài</string>
     <string name="dictionary">Từ điển</string>
+    <string name="daily_progress">Tiến độ ngày: %d/%d bài</string>
+    <string name="daily_goal_reached">Đã đạt mục tiêu ngày: %d/%d bài</string>
+    <string name="no_daily_goal_set">Chưa đặt mục tiêu ngày</string>
 
     <!-- Auth Activity -->
     <string name="login">Đăng nhập</string>

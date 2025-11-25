@@ -14,12 +14,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.TokenManager;
-import com.ptithcm.lexigo.api.models.Goals;
 import com.ptithcm.lexigo.api.models.ProgressSummary;
-import com.ptithcm.lexigo.api.models.Statistics;
 import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
-import com.ptithcm.lexigo.dialogs.SetGoalsDialog;
+import com.ptithcm.lexigo.utils.DailyProgressTracker;
 
 /**
  * Màn hình thông tin tài khoản người dùng
@@ -33,13 +31,12 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUserEmail;
     private Chip chipLevel;
     private TextView tvLessonsStatistics;
-    private ProgressBar progressLessons;
-    private TextView tvTotalLessons;
     private MaterialButton btnUpdateProfile;
     private MaterialButton btnChangePassword;
     private MaterialButton btnDetailedStats;
     private MaterialButton btnLogout;
     private ProgressBar loadingIndicator;
+    private TextView tvDailyGoalStatus;
 
     // Managers & Repositories
     private TokenManager tokenManager;
@@ -48,7 +45,10 @@ public class ProfileActivity extends AppCompatActivity {
     // Dữ liệu người dùng
     private User currentUser;
     private ProgressSummary userProgress;
-    private int totalLessons = 100; // Tổng số bài học trong hệ thống
+
+    // Daily goal tracking
+    private int dailyGoalTarget = 0;
+    private int dailyCompletedToday = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,13 +106,12 @@ public class ProfileActivity extends AppCompatActivity {
         tvUserEmail = findViewById(R.id.tvUserEmail);
         chipLevel = findViewById(R.id.chipLevel);
         tvLessonsStatistics = findViewById(R.id.tvLessonsStatistics);
-        progressLessons = findViewById(R.id.progressLessons);
-        tvTotalLessons = findViewById(R.id.tvTotalLessons);
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnDetailedStats = findViewById(R.id.btnDetailedStats);
         btnLogout = findViewById(R.id.btnLogout);
         loadingIndicator = findViewById(R.id.loadingIndicator);
+        tvDailyGoalStatus = findViewById(R.id.tvDailyGoalStatus);
     }
 
     /**
@@ -125,12 +124,17 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onSuccess(User user) {
                 currentUser = user;
+                if (user.getGoals() != null) {
+                    dailyGoalTarget = user.getGoals().getDailyLessons();
+                }
+                dailyCompletedToday = DailyProgressTracker.getInstance(ProfileActivity.this).getDailyProgress();
                 displayUserProfile();
                 showLoading(false);
             }
 
             @Override
             public void onError(String error) {
+                dailyCompletedToday = DailyProgressTracker.getInstance(ProfileActivity.this).getDailyProgress();
                 showLoading(false);
                 Toast.makeText(ProfileActivity.this,
                     "Lỗi tải thông tin: " + error, Toast.LENGTH_SHORT).show();
@@ -199,11 +203,17 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Hiển thị số bài đã hoàn thành
         tvLessonsStatistics.setText(getString(R.string.lessons_statistics, completedLessons));
-        tvTotalLessons.setText(getString(R.string.total_lessons, totalLessons));
 
-        // Cập nhật progress bar
-        int progressPercentage = totalLessons > 0 ? (completedLessons * 100) / totalLessons : 0;
-        progressLessons.setProgress(progressPercentage);
+        // Daily goal status
+        if (dailyGoalTarget <= 0) {
+            tvDailyGoalStatus.setText(getString(R.string.no_daily_goal_set));
+        } else {
+            if (dailyCompletedToday >= dailyGoalTarget) {
+                tvDailyGoalStatus.setText(getString(R.string.daily_goal_reached, dailyCompletedToday, dailyGoalTarget));
+            } else {
+                tvDailyGoalStatus.setText(getString(R.string.daily_progress, dailyCompletedToday, dailyGoalTarget));
+            }
+        }
     }
 
     /**
@@ -277,31 +287,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Hiển thị dialog thiết lập mục tiêu
-     */
-    private void showSetGoalsDialog() {
-        if (currentUser == null) {
-            Toast.makeText(this, "Đang tải thông tin...", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        SetGoalsDialog dialog = new SetGoalsDialog(this, currentUser, new SetGoalsDialog.GoalsUpdateListener() {
-            @Override
-            public void onGoalsUpdated(Goals goals) {
-                // Cập nhật currentUser với goals mới
-                if (currentUser != null) {
-                    currentUser.setGoals(goals);
-                }
-                Toast.makeText(ProfileActivity.this,
-                    String.format("Mục tiêu: %d từ, %d bài/ngày",
-                        goals.getDailyWords(), goals.getDailyLessons()),
-                    Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show();
-    }
-
-    /**
      * Xử lý đăng xuất
      */
     private void handleLogout() {
@@ -316,13 +301,4 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-
-    @Override
-    public void onBackPressed() {
-        // Trở về HomeActivity thay vì thoát ứng dụng
-        super.onBackPressed();
-        finish();
-    }
 }
-

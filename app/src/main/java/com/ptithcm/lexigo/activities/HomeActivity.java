@@ -2,8 +2,6 @@ package com.ptithcm.lexigo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +18,7 @@ import com.ptithcm.lexigo.api.models.ProgressSummary;
 import com.ptithcm.lexigo.api.models.User;
 import com.ptithcm.lexigo.api.repositories.LexiGoRepository;
 import com.ptithcm.lexigo.models.LearningCategory;
+import com.ptithcm.lexigo.utils.DailyProgressTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     // UI Components
     private MaterialButton btnAccount;
     private TextView tvLessonsCompleted;
-    private TextView tvDailyGoal;
-    private ProgressBar progressDaily;
+    private TextView tvDailyStatus;
     private RecyclerView rvLearningCategories;
     private FloatingActionButton fabChat;
 
@@ -45,11 +43,12 @@ public class HomeActivity extends AppCompatActivity {
     private TokenManager tokenManager;
     private LexiGoRepository repository;
 
-    private int dailyGoalTarget = 5; // Mặc định
     private int completedLessons = 0;
-    private int dailyGoalCurrent = 0;
 
     private User currentUser;
+
+    private int dailyGoalTarget = 0;
+    private int dailyCompletedToday = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +84,7 @@ public class HomeActivity extends AppCompatActivity {
     private void initViews() {
         btnAccount = findViewById(R.id.btnAccount);
         tvLessonsCompleted = findViewById(R.id.tvLessonsCompleted);
-        tvDailyGoal = findViewById(R.id.tvDailyGoal);
-        progressDaily = findViewById(R.id.progressDaily);
+        tvDailyStatus = findViewById(R.id.tvDailyStatus);
         rvLearningCategories = findViewById(R.id.rvLearningCategories);
         fabChat = findViewById(R.id.fabChat);
     }
@@ -95,16 +93,17 @@ public class HomeActivity extends AppCompatActivity {
      * Thiết lập dữ liệu tiến độ học tập
      */
     private void setupProgressData() {
-        // Hiển thị số bài đã hoàn thành
         tvLessonsCompleted.setText(getString(R.string.lessons_completed, completedLessons));
-
-        // Hiển thị mục tiêu hàng ngày
-        tvDailyGoal.setText(getString(R.string.daily_goal, dailyGoalCurrent, dailyGoalTarget));
-
-        // Cập nhật progress bar
-
-        int progressPercentage = dailyGoalTarget > 0 ? (dailyGoalCurrent * 100) / dailyGoalTarget : 0;
-        progressDaily.setProgress(progressPercentage);
+        // Daily status text
+        if (dailyGoalTarget <= 0) {
+            tvDailyStatus.setText(getString(R.string.no_daily_goal_set));
+        } else {
+            if (dailyCompletedToday >= dailyGoalTarget) {
+                tvDailyStatus.setText(getString(R.string.daily_goal_reached, dailyCompletedToday, dailyGoalTarget));
+            } else {
+                tvDailyStatus.setText(getString(R.string.daily_progress, dailyCompletedToday, dailyGoalTarget));
+            }
+        }
     }
 
     /**
@@ -112,7 +111,8 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void loadUserProfile() {
         if (!tokenManager.isLoggedIn()) {
-            // Nếu chưa đăng nhập, hiển thị dữ liệu mặc định
+            dailyGoalTarget = 0;
+            dailyCompletedToday = DailyProgressTracker.getInstance(this).getDailyProgress();
             setupProgressData();
             return;
         }
@@ -122,10 +122,11 @@ public class HomeActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 currentUser = user;
 
-                // Lấy goals từ user
                 if (user.getGoals() != null) {
                     dailyGoalTarget = user.getGoals().getDailyLessons();
                 }
+
+                dailyCompletedToday = DailyProgressTracker.getInstance(HomeActivity.this).getDailyProgress();
 
                 // Sau khi có goals, load progress data
                 loadProgressData();
@@ -133,6 +134,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
+                dailyCompletedToday = DailyProgressTracker.getInstance(HomeActivity.this).getDailyProgress();
                 // Nếu lỗi, vẫn load progress với goal mặc định
                 loadProgressData();
             }
@@ -156,9 +158,6 @@ public class HomeActivity extends AppCompatActivity {
                 // Cập nhật tổng số bài đã hoàn thành
                 completedLessons = progressSummary.getTotalCompleted();
 
-                // Tính số bài đã học trong ngày dựa trên last_updated
-                dailyGoalCurrent = calculateDailyProgress(progressSummary);
-
                 setupProgressData();
             }
 
@@ -168,40 +167,6 @@ public class HomeActivity extends AppCompatActivity {
                 setupProgressData();
             }
         });
-    }
-
-    /**
-     * Tính số bài đã học trong ngày
-     * Lưu ý: Hiện tại API không có endpoint riêng cho daily progress
-     * Workaround: Kiểm tra last_updated có phải hôm nay không
-     */
-    private int calculateDailyProgress(ProgressSummary summary) {
-        if (summary == null || summary.getLastUpdated() == null) {
-            return 0;
-        }
-
-        try {
-            // Parse last_updated: "2025-11-12T09:09:51.022000"
-            String lastUpdated = summary.getLastUpdated();
-            String dateOnly = lastUpdated.substring(0, 10); // "2025-11-12"
-
-            // Lấy ngày hôm nay
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
-            String today = sdf.format(new java.util.Date());
-
-            // Nếu last_updated là hôm nay, giả định user đã học ít nhất 1 bài
-            if (dateOnly.equals(today)) {
-                // Tạm thời return total_completed % dailyGoalTarget để mô phỏng
-                // Trong thực tế, cần API endpoint riêng cho daily progress
-                int total = summary.getTotalCompleted();
-                return Math.min(total, dailyGoalTarget);
-            }
-
-            return 0;
-        } catch (Exception e) {
-            Log.e("HomeActivity", "Error calculating daily progress", e);
-            return 0;
-        }
     }
 
     /**
@@ -307,4 +272,3 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 }
-
