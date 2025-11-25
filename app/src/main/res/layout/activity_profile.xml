@@ -43,8 +43,9 @@
                         android:id="@+id/imgAvatar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@android:drawable/ic_menu_myplaces"
+                        android:src="@drawable/ic_profile"
                         android:scaleType="centerCrop"
+                        app:tint="@color/primary"
                         android:contentDescription="Avatar"/>
 
                 </com.google.android.material.card.MaterialCardView>

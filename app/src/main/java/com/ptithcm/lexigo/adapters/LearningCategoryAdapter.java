@@ -29,6 +29,9 @@ public class LearningCategoryAdapter extends RecyclerView.Adapter<LearningCatego
         void onItemClick(LearningCategory category);
     }
 
+    private static final int TYPE_GRID = 0;
+    private static final int TYPE_LIST = 1;
+
     public LearningCategoryAdapter(Context context, List<LearningCategory> categories) {
         this.context = context;
         this.categories = categories;
@@ -38,10 +41,17 @@ public class LearningCategoryAdapter extends RecyclerView.Adapter<LearningCatego
         this.listener = listener;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        // First 4 items are grid, others are list
+        return position < 4 ? TYPE_GRID : TYPE_LIST;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_learning_category, parent, false);
+        int layoutId = (viewType == TYPE_GRID) ? R.layout.item_learning_category_grid : R.layout.item_learning_category;
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         return new ViewHolder(view);
     }
 

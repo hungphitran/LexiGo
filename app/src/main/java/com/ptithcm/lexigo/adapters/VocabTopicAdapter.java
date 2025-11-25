@@ -44,7 +44,7 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_vocab_topic, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_vocab_topic_grid, parent, false);
         return new ViewHolder(view);
     }
     

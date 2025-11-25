@@ -215,7 +215,16 @@ public class HomeActivity extends AppCompatActivity {
         categoryAdapter = new LearningCategoryAdapter(this, categories);
 
         // Thiết lập adapter và layout manager
-        rvLearningCategories.setLayoutManager(new LinearLayoutManager(this));
+        androidx.recyclerview.widget.GridLayoutManager gridLayoutManager = new androidx.recyclerview.widget.GridLayoutManager(this, 2);
+        gridLayoutManager.setSpanSizeLookup(new androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                // First 4 items take 1 span (half width), others take 2 spans (full width)
+                return position < 4 ? 1 : 2;
+            }
+        });
+        
+        rvLearningCategories.setLayoutManager(gridLayoutManager);
         rvLearningCategories.setAdapter(categoryAdapter);
 
         // Xử lý sự kiện click item

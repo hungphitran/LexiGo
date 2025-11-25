@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -73,6 +74,9 @@ public class QuizActivity extends AppCompatActivity {
     private int score = 0;
     private int correctAnswers = 0;
 
+    // Track per-question results for review and final dialog
+    private List<QuestionResult> quizResults;
+
     private String quizType;
     private String topicId;
     private String lessonId;
@@ -104,6 +108,26 @@ public class QuizActivity extends AppCompatActivity {
         initViews();
         loadQuiz();
         startTime = System.currentTimeMillis();
+
+        // Initialize results list
+        quizResults = new ArrayList<>();
+
+        // Handle system back via OnBackPressedDispatcher with confirmation when a quiz is in progress
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (quizQuestions != null && currentQuestionIndex > 0 && currentQuestionIndex < quizQuestions.size()) {
+                    new AlertDialog.Builder(QuizActivity.this)
+                        .setTitle("Exit Quiz?")
+                        .setMessage("Your progress will be lost. Are you sure you want to exit?")
+                        .setPositiveButton("Yes", (dialog, which) -> finish())
+                        .setNegativeButton("No", null)
+                        .show();
+                } else {
+                    finish();
+                }
+            }
+        });
     }
 
     private void initViews() {
@@ -481,6 +505,15 @@ public class QuizActivity extends AppCompatActivity {
             isCorrect = selectedAnswer.equals(correctAnswer);
         }
 
+        // Save result for final dialog/review
+        quizResults.add(new QuestionResult(
+            currentQuestion.getQuestion(),
+            selectedAnswer,
+            correctAnswer,
+            isCorrect,
+            currentQuestion.getExplanation()
+        ));
+
         // Update score
         if (isCorrect) {
             correctAnswers++;
@@ -567,7 +600,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void showFinalResults() {
         int totalQuestions = quizQuestions.size();
-        double percentage = (double) correctAnswers / totalQuestions * 100;
+        double percentage = totalQuestions > 0 ? (double) correctAnswers / totalQuestions * 100 : 0;
         int maxScore = totalQuestions * 10;
 
         // Determine performance level
@@ -587,49 +620,88 @@ public class QuizActivity extends AppCompatActivity {
         // Tự động cập nhật tiến độ dựa trên loại quiz
         updateProgressForQuizCompletion();
 
-        // Create result dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🎉 Quiz Completed!");
+        // Inflate the shared dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_quiz_results, null);
+        TextView tvScore = dialogView.findViewById(R.id.tvScore);
+        LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
 
-        String message = String.format(
-            "Performance: %s\n\n" +
-            "Correct Answers: %d/%d\n" +
-            "Score: %d/%d\n" +
-            "Percentage: %.1f%%",
-            performanceLevel, correctAnswers, totalQuestions, score, maxScore, percentage
-        );
+        // Set summary data (show percentage as /100)
+        int displayScore = (int) Math.round(percentage);
+        tvScore.setText(displayScore + "/100");
 
-        builder.setMessage(message);
-        builder.setCancelable(false);
+        // Populate question details from quizResults
+        for (int i = 0; i < quizResults.size(); i++) {
+            QuestionResult result = quizResults.get(i);
 
-        builder.setPositiveButton("Review Answers", (dialog, which) -> {
-            // Reset to first question for review
-            currentQuestionIndex = 0;
-            displayQuestion();
-            btnSubmit.setVisibility(View.GONE);
-            btnNext.setVisibility(View.VISIBLE);
-        });
+            LinearLayout questionView = new LinearLayout(this);
+            questionView.setOrientation(LinearLayout.VERTICAL);
+            questionView.setPadding(16, 12, 16, 12);
+            questionView.setBackgroundColor(result.isCorrect ?
+                getResources().getColor(R.color.beginner_color, null) :
+                getResources().getColor(R.color.advanced_color, null));
+            questionView.getBackground().setAlpha(30);
 
-        builder.setNeutralButton("Về trang chủ", (dialog, which) -> {
-            // Quay về HomeActivity
-            Intent intent = new Intent(QuizActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 16);
+            questionView.setLayoutParams(params);
 
-        builder.setNegativeButton("Finish", (dialog, which) -> {
-            finish();
-        });
+            TextView tvQuestionStatus = new TextView(this);
+            tvQuestionStatus.setText(String.format("Câu %d: %s",
+                i + 1,
+                result.isCorrect ? "✓ Đúng" : "✗ Sai"));
+            tvQuestionStatus.setTextSize(14);
+            tvQuestionStatus.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvQuestionStatus.setTextColor(result.isCorrect ?
+                getResources().getColor(R.color.beginner_color, null) :
+                getResources().getColor(R.color.advanced_color, null));
+            questionView.addView(tvQuestionStatus);
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+            if (!result.isCorrect) {
+                TextView tvAnswer = new TextView(this);
+                tvAnswer.setText(String.format("Bạn chọn: %s\nĐáp án đúng: %s",
+                    result.selectedAnswer, result.correctAnswer));
+                tvAnswer.setTextSize(12);
+                tvAnswer.setTextColor(getResources().getColor(R.color.text_secondary, null));
+                tvAnswer.setPadding(0, 8, 0, 0);
+                questionView.addView(tvAnswer);
 
-        // Color the message text
-        TextView messageView = dialog.findViewById(android.R.id.message);
-        if (messageView != null) {
-            messageView.setTextColor(performanceColor);
+                if (result.explanation != null && !result.explanation.isEmpty()) {
+                    TextView tvExplanation = new TextView(this);
+                    tvExplanation.setText("Giải thích: " + result.explanation);
+                    tvExplanation.setTextSize(12);
+                    tvExplanation.setTextColor(getResources().getColor(R.color.text_secondary, null));
+                    tvExplanation.setPadding(0, 4, 0, 0);
+                    tvExplanation.setTypeface(null, android.graphics.Typeface.ITALIC);
+                    questionView.addView(tvExplanation);
+                }
+            }
+
+            llQuestionDetails.addView(questionView);
         }
+
+        // Show dialog with same buttons as before
+        new AlertDialog.Builder(this)
+            .setTitle("Kết quả bài làm")
+            .setView(dialogView)
+            .setPositiveButton("Review Answers", (dialog, which) -> {
+                // Reset to first question for review
+                currentQuestionIndex = 0;
+                displayQuestion();
+                btnSubmit.setVisibility(View.GONE);
+                btnNext.setVisibility(View.VISIBLE);
+            })
+            .setNeutralButton("Về trang chủ", (dialog, which) -> {
+                Intent intent = new Intent(QuizActivity.this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                finish();
+            })
+            .setNegativeButton("Finish", (dialog, which) -> finish())
+            .setCancelable(false)
+            .show();
     }
 
     private void showError(String message) {
@@ -685,26 +757,9 @@ public class QuizActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        // Show confirmation dialog if quiz is in progress
-        if (currentQuestionIndex > 0 && currentQuestionIndex < quizQuestions.size()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Exit Quiz?")
-                .setMessage("Your progress will be lost. Are you sure you want to exit?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    super.onBackPressed();
-                })
-                .setNegativeButton("No", null)
-                .show();
-        } else {
-            super.onBackPressed();
-        }
-    }
+    // remove the old onBackPressed override - handled by OnBackPressedCallback now
 
-    /**
-     * Inner class to represent a unified quiz question
-     */
+    // Inner class to represent a unified quiz question
     private static class QuizQuestion {
         private String question;
         private String questionType;
@@ -749,6 +804,23 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         public void setExplanation(String explanation) {
+            this.explanation = explanation;
+        }
+    }
+
+    // New inner class to store per-question result
+    private static class QuestionResult {
+        String question;
+        String selectedAnswer;
+        String correctAnswer;
+        boolean isCorrect;
+        String explanation;
+
+        QuestionResult(String question, String selectedAnswer, String correctAnswer, boolean isCorrect, String explanation) {
+            this.question = question;
+            this.selectedAnswer = selectedAnswer;
+            this.correctAnswer = correctAnswer;
+            this.isCorrect = isCorrect;
             this.explanation = explanation;
         }
     }

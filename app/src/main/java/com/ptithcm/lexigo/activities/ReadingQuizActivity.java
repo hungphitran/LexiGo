@@ -261,21 +261,16 @@ public class ReadingQuizActivity extends AppCompatActivity {
         
         // Get views
         TextView tvScore = dialogView.findViewById(R.id.tvScore);
-        TextView tvCorrectCount = dialogView.findViewById(R.id.tvCorrectCount);
-        TextView tvWrongCount = dialogView.findViewById(R.id.tvWrongCount);
         LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
         
         // Set summary data
         tvScore.setText(result.getScore() + "/100");
-        tvCorrectCount.setText(String.valueOf(result.getCorrectAnswers()));
-        int wrongCount = result.getTotalQuestions() - result.getCorrectAnswers();
-        tvWrongCount.setText(String.valueOf(wrongCount));
-        
+
         // Add question details
         if (result.getResults() != null && !result.getResults().isEmpty()) {
             for (int i = 0; i < result.getResults().size(); i++) {
                 ReadingResult.QuestionResult questionResult = result.getResults().get(i);
-                
+
                 // Create question detail view
                 LinearLayout questionView = new LinearLayout(this);
                 questionView.setOrientation(LinearLayout.VERTICAL);

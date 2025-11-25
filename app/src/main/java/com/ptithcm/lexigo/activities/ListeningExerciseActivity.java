@@ -274,8 +274,6 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         
         // Get views
         TextView tvScore = dialogView.findViewById(R.id.tvScore);
-        TextView tvCorrectCount = dialogView.findViewById(R.id.tvCorrectCount);
-        TextView tvWrongCount = dialogView.findViewById(R.id.tvWrongCount);
         LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
         
         // Calculate score
@@ -285,9 +283,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
         
         // Set summary data
         tvScore.setText(finalScore + "/100");
-        tvCorrectCount.setText(String.valueOf(correctCount));
-        tvWrongCount.setText(String.valueOf(wrongCount));
-        
+
         // Add exercise details
         for (int i = 0; i < sessionResults.size(); i++) {
             ExerciseResult result = sessionResults.get(i);

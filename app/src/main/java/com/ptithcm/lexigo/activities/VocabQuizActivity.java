@@ -266,13 +266,11 @@ public class VocabQuizActivity extends AppCompatActivity {
     private void showEnhancedResults() {
         // Inflate custom dialog layout
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_quiz_results, null);
-        
+
         // Get views
         TextView tvScore = dialogView.findViewById(R.id.tvScore);
-        TextView tvCorrectCount = dialogView.findViewById(R.id.tvCorrectCount);
-        TextView tvWrongCount = dialogView.findViewById(R.id.tvWrongCount);
         LinearLayout llQuestionDetails = dialogView.findViewById(R.id.llQuestionDetails);
-        
+
         // Calculate score (0-100)
         int maxScore = quizList.size() * 10;
         int correctCount = score / 10; // Convert points back to correct answer count
@@ -281,13 +279,11 @@ public class VocabQuizActivity extends AppCompatActivity {
 
         // Set summary data
         tvScore.setText(finalScore + "/100");
-        tvCorrectCount.setText(String.valueOf(correctCount));
-        tvWrongCount.setText(String.valueOf(wrongCount));
-        
+
         // Add question details
         for (int i = 0; i < quizResults.size(); i++) {
             QuizResult result = quizResults.get(i);
-            
+
             // Create question detail view
             LinearLayout questionView = new LinearLayout(this);
             questionView.setOrientation(LinearLayout.VERTICAL);
@@ -296,14 +292,14 @@ public class VocabQuizActivity extends AppCompatActivity {
                 getResources().getColor(R.color.beginner_color, null) : 
                 getResources().getColor(R.color.advanced_color, null));
             questionView.getBackground().setAlpha(30);
-            
+
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             );
             params.setMargins(0, 0, 0, 16);
             questionView.setLayoutParams(params);
-            
+
             // Question title and status
             TextView tvQuestionStatus = new TextView(this);
             tvQuestionStatus.setText(String.format("Câu %d: %s", 
@@ -315,7 +311,7 @@ public class VocabQuizActivity extends AppCompatActivity {
                 getResources().getColor(R.color.beginner_color, null) : 
                 getResources().getColor(R.color.advanced_color, null));
             questionView.addView(tvQuestionStatus);
-            
+
             // Show answer details if wrong
             if (!result.isCorrect) {
                 TextView tvAnswer = new TextView(this);
@@ -325,7 +321,7 @@ public class VocabQuizActivity extends AppCompatActivity {
                 tvAnswer.setTextColor(getResources().getColor(R.color.text_secondary, null));
                 tvAnswer.setPadding(0, 8, 0, 0);
                 questionView.addView(tvAnswer);
-                
+
                 // Show explanation if available
                 if (result.explanation != null && !result.explanation.isEmpty()) {
                     TextView tvExplanation = new TextView(this);
@@ -337,10 +333,10 @@ public class VocabQuizActivity extends AppCompatActivity {
                     questionView.addView(tvExplanation);
                 }
             }
-            
+
             llQuestionDetails.addView(questionView);
         }
-        
+
         // Show dialog
         new AlertDialog.Builder(this)
                 .setTitle("Kết quả bài làm")

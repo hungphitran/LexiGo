@@ -59,7 +59,7 @@ public class VocabTopicsActivity extends AppCompatActivity {
     }
     
     private void setupRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
         adapter = new VocabTopicAdapter(this, new ArrayList<>(), topic -> {
             // Navigate to vocab lessons for this topic
              Intent intent = new Intent(this, VocabLessonsActivity.class);
