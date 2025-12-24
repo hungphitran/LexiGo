@@ -55,6 +55,12 @@ public class VocabTopicsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_vocab_topics);
         progressBar = findViewById(R.id.progress_bar);
         
+        // Setup toolbar back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+        
         apiService = ApiClient.getInstance(this).getApiService();
     }
     

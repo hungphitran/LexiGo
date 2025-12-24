@@ -3,12 +3,12 @@ package com.ptithcm.lexigo.activities;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +34,9 @@ public class DictionaryActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TextInputEditText etSearchWord;
     private MaterialButton btnSearch;
-    private ProgressBar progressBar;
+    private TextView tvLoading;
     private LinearLayout layoutEmptyState;
-    private LinearLayout layoutErrorState;
+    private MaterialCardView layoutErrorState;
     private MaterialCardView cardResult;
     private TextView tvWord;
     private TextView tvPhonetic;
@@ -49,7 +49,7 @@ public class DictionaryActivity extends AppCompatActivity {
     private TextView tvSynonymsLabel;
     private TextView tvSynonyms;
     private TextView tvErrorMessage;
-    private ImageView ivSpeaker;
+    private MaterialButton ivSpeaker;
 
     // Repository
     private LexiGoRepository repository;
@@ -57,6 +57,11 @@ public class DictionaryActivity extends AppCompatActivity {
     // MediaPlayer for audio playback
     private MediaPlayer mediaPlayer;
     private String currentAudioUrl;
+    
+    // Thinking animation
+    private Handler thinkingHandler;
+    private Runnable thinkingRunnable;
+    private int dotCount = 0;
 
 
     @Override
@@ -79,7 +84,7 @@ public class DictionaryActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         etSearchWord = findViewById(R.id.etSearchWord);
         btnSearch = findViewById(R.id.btnSearch);
-        progressBar = findViewById(R.id.progressBar);
+        tvLoading = findViewById(R.id.tvLoading);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
         layoutErrorState = findViewById(R.id.layoutErrorState);
         cardResult = findViewById(R.id.cardResult);
@@ -101,12 +106,7 @@ public class DictionaryActivity extends AppCompatActivity {
      * Thiết lập toolbar
      */
     private void setupToolbar() {
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     /**
@@ -164,7 +164,7 @@ public class DictionaryActivity extends AppCompatActivity {
      * Hiển thị kết quả tra cứu
      */
     private void showResult(DictionaryEntry entry) {
-        progressBar.setVisibility(View.GONE);
+        hideLoading();
         layoutEmptyState.setVisibility(View.GONE);
         layoutErrorState.setVisibility(View.GONE);
         cardResult.setVisibility(View.VISIBLE);
@@ -248,20 +248,61 @@ public class DictionaryActivity extends AppCompatActivity {
     }
 
     /**
-     * Hiển thị loading
+     * Hiển thị loading với animation "Thinking..."
      */
     private void showLoading() {
-        progressBar.setVisibility(View.VISIBLE);
+        tvLoading.setVisibility(View.VISIBLE);
         layoutEmptyState.setVisibility(View.GONE);
         layoutErrorState.setVisibility(View.GONE);
         cardResult.setVisibility(View.GONE);
+        
+        // Start thinking animation
+        startThinkingAnimation();
+    }
+    
+    /**
+     * Dừng animation và ẩn loading
+     */
+    private void hideLoading() {
+        stopThinkingAnimation();
+        tvLoading.setVisibility(View.GONE);
+    }
+    
+    /**
+     * Bắt đầu animation "Thinking..."
+     */
+    private void startThinkingAnimation() {
+        dotCount = 0;
+        thinkingHandler = new Handler(Looper.getMainLooper());
+        thinkingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                dotCount = (dotCount % 3) + 1;
+                StringBuilder dots = new StringBuilder("Thinking");
+                for (int i = 0; i < dotCount; i++) {
+                    dots.append(".");
+                }
+                tvLoading.setText(dots.toString());
+                thinkingHandler.postDelayed(this, 400);
+            }
+        };
+        thinkingHandler.post(thinkingRunnable);
+    }
+    
+    /**
+     * Dừng animation
+     */
+    private void stopThinkingAnimation() {
+        if (thinkingHandler != null && thinkingRunnable != null) {
+            thinkingHandler.removeCallbacks(thinkingRunnable);
+        }
     }
 
     /**
      * Hiển thị error
      */
     private void showError(String message) {
-        progressBar.setVisibility(View.GONE);
+        hideLoading();
         layoutEmptyState.setVisibility(View.GONE);
         layoutErrorState.setVisibility(View.VISIBLE);
         cardResult.setVisibility(View.GONE);

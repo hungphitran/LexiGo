@@ -8,21 +8,19 @@
     android:background="@color/background"
     tools:context=".activities.DictionaryActivity">
 
-    <!-- App Bar Layout -->
+    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        style="@style/Widget.LexiGo.AppBarLayout">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            style="@style/Widget.LexiGo.Toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:navigationIcon="@drawable/ic_back"
-            app:title="Từ điển Anh - Việt"
-            app:titleTextColor="@color/white"/>
+            android:layout_height="@dimen/toolbar_height"
+            app:title="@string/dictionary"
+            app:navigationIcon="@drawable/ic_back"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -36,43 +34,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/spacing_md">
 
             <!-- Search Card -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.LexiGo.Card.Dictionary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="@dimen/spacing_md"
+                app:cardBackgroundColor="@color/surface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/spacing_md">
 
                     <!-- Title -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tra cứu từ điển Anh - Việt"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginBottom="12dp"/>
+                        android:text="@string/search_dictionary_title"
+                        android:textAppearance="@style/TextAppearance.LexiGo.TitleSmall"
+                        android:layout_marginBottom="@dimen/spacing_sm"/>
 
                     <!-- Search Input -->
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.LexiGo.TextInputLayout.Search"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Nhập từ tiếng Anh cần tra..."
+                        android:hint="@string/search_word_hint"
                         app:startIconDrawable="@drawable/ic_search"
-                        app:endIconMode="clear_text"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        app:startIconTint="@color/dictionary_primary">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etSearchWord"
+                            style="@style/Widget.LexiGo.TextInputEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:imeOptions="actionSearch"
@@ -84,11 +81,12 @@
                     <!-- Search Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSearch"
+                        style="@style/Widget.LexiGo.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Tra cứu"
-                        android:textSize="16sp"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:text="@string/search"
+                        app:backgroundTint="@color/dictionary_primary"
                         app:icon="@drawable/ic_search"
                         app:iconGravity="textStart"/>
 
@@ -96,13 +94,17 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Loading Progress -->
-            <ProgressBar
-                android:id="@+id/progressBar"
+            <!-- Loading Text -->
+            <TextView
+                android:id="@+id/tvLoading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginVertical="24dp"
+                android:layout_marginVertical="@dimen/spacing_lg"
+                android:text="Thinking"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
                 android:visibility="gone"/>
 
             <!-- Empty State -->
@@ -112,22 +114,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="32dp"
+                android:padding="@dimen/spacing_xl"
                 android:visibility="visible">
 
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="@dimen/avatar_xl"
+                    android:layout_height="@dimen/avatar_xl"
                     android:src="@drawable/ic_category_dictionary"
                     android:alpha="0.3"
-                    android:contentDescription="Dictionary icon"/>
+                    android:contentDescription="@string/dictionary"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Nhập từ để bắt đầu tra cứu"
-                    android:textSize="16sp"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:text="@string/empty_search_hint"
+                    android:textAppearance="@style/TextAppearance.LexiGo.Body"
                     android:textColor="@color/text_secondary"
                     android:textAlignment="center"/>
 
@@ -136,17 +138,16 @@
             <!-- Result Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardResult"
+                style="@style/Widget.LexiGo.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/spacing_md">
 
                     <!-- Word Header -->
                     <LinearLayout
@@ -154,27 +155,26 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="@dimen/spacing_sm">
 
                         <TextView
                             android:id="@+id/tvWord"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Word"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/primary"/>
+                            android:textAppearance="@style/TextAppearance.LexiGo.TitleLarge"
+                            android:textColor="@color/dictionary_primary"
+                            tools:text="Word"/>
 
-                        <ImageView
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/ivSpeaker"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_volume"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="4dp"
+                            style="@style/Widget.LexiGo.Button.Icon"
+                            android:layout_width="@dimen/touch_target_min"
+                            android:layout_height="@dimen/touch_target_min"
                             android:contentDescription="Speak"
-                            android:visibility="gone"/>
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_volume"
+                            app:iconTint="@color/dictionary_primary"/>
 
                     </LinearLayout>
 
@@ -183,155 +183,151 @@
                         android:id="@+id/tvPhonetic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/fəˈnetɪk/"
-                        android:textSize="16sp"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Body"
                         android:textColor="@color/text_secondary"
-                        android:layout_marginBottom="8dp"
-                        android:visibility="gone"/>
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:visibility="gone"
+                        tools:text="/fəˈnetɪk/"/>
 
                     <!-- Part of Speech -->
-                    <TextView
+                    <com.google.android.material.chip.Chip
                         android:id="@+id/tvPartOfSpeech"
+                        style="@style/Widget.LexiGo.Chip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="noun"
-                        android:textSize="14sp"
-                        android:textStyle="italic"
-                        android:textColor="@color/accent"
-                        android:layout_marginBottom="12dp"
-                        android:visibility="gone"/>
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:visibility="gone"
+                        app:chipBackgroundColor="@color/dictionary_surface"
+                        android:textColor="@color/dictionary_on_surface"
+                        tools:text="noun"/>
 
                     <!-- Divider -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/divider"
-                        android:layout_marginVertical="8dp"/>
+                        android:layout_marginVertical="@dimen/spacing_sm"/>
 
                     <!-- Translation -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bản dịch:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="8dp"/>
+                        android:text="@string/translation_label"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Label"
+                        android:layout_marginTop="@dimen/spacing_sm"/>
 
                     <TextView
                         android:id="@+id/tvTranslation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Translation here"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="12dp"/>
+                        android:textAppearance="@style/TextAppearance.LexiGo.BodyLarge"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        tools:text="Translation here"/>
 
                     <!-- Definitions -->
                     <TextView
                         android:id="@+id/tvDefinitionsLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Định nghĩa:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="8dp"
+                        android:text="@string/definitions_label"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Label"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/tvDefinitions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Definitions here"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="12dp"
-                        android:visibility="gone"/>
+                        android:textAppearance="@style/TextAppearance.LexiGo.Body"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:visibility="gone"
+                        tools:text="Definitions here"/>
 
                     <!-- Examples -->
                     <TextView
                         android:id="@+id/tvExamplesLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ví dụ:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="8dp"
+                        android:text="@string/examples_label"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Label"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/tvExamples"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Examples here"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="12dp"
-                        android:visibility="gone"/>
+                        android:textAppearance="@style/TextAppearance.LexiGo.BodySmall"
+                        android:fontFamily="@font/nunito_italic"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:visibility="gone"
+                        tools:text="Examples here"/>
 
                     <!-- Synonyms -->
                     <TextView
                         android:id="@+id/tvSynonymsLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Từ đồng nghĩa:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginTop="8dp"
+                        android:text="@string/synonyms_label"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Label"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/tvSynonyms"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Synonyms here"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginTop="4dp"
-                        android:visibility="gone"/>
+                        android:textAppearance="@style/TextAppearance.LexiGo.BodySmall"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:visibility="gone"
+                        tools:text="Synonyms here"/>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Error State -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/layoutErrorState"
+                style="@style/Widget.LexiGo.Card.Error"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="32dp"
                 android:visibility="gone">
 
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/ic_error"
-                    android:alpha="0.5"
-                    android:contentDescription="Error icon"/>
-
-                <TextView
-                    android:id="@+id/tvErrorMessage"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Không tìm thấy từ này"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_secondary"
-                    android:textAlignment="center"/>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_xl">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_xxl"
+                        android:layout_height="@dimen/icon_size_xxl"
+                        android:src="@drawable/ic_error"
+                        android:alpha="0.5"
+                        android:contentDescription="@string/error"
+                        app:tint="@color/error"/>
+
+                    <TextView
+                        android:id="@+id/tvErrorMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_md"
+                        android:text="@string/word_not_found"
+                        android:textAppearance="@style/TextAppearance.LexiGo.Body"
+                        android:textColor="@color/error"
+                        android:textAlignment="center"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

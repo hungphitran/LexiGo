@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.adapters.LearningCategoryAdapter;
 import com.ptithcm.lexigo.api.TokenManager;
@@ -30,11 +30,12 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity {
 
     // UI Components
-    private MaterialButton btnAccount;
-    private TextView tvLessonsCompleted;
-    private TextView tvDailyStatus;
+    private MaterialCardView cardUserAvatar;
+    private com.google.android.material.floatingactionbutton.FloatingActionButton fabChatAI;
+    private TextView tvDailyProgress;
+    private TextView tvMotivation;
+    private LinearProgressIndicator progressDaily;
     private RecyclerView rvLearningCategories;
-    private FloatingActionButton fabChat;
 
     // Adapter
     private LearningCategoryAdapter categoryAdapter;
@@ -82,26 +83,34 @@ public class HomeActivity extends AppCompatActivity {
      * Khởi tạo các view components
      */
     private void initViews() {
-        btnAccount = findViewById(R.id.btnAccount);
-        tvLessonsCompleted = findViewById(R.id.tvLessonsCompleted);
-        tvDailyStatus = findViewById(R.id.tvDailyStatus);
+        cardUserAvatar = findViewById(R.id.cardUserAvatar);
+        fabChatAI = findViewById(R.id.fabChatAI);
+        tvDailyProgress = findViewById(R.id.tvDailyProgress);
+        tvMotivation = findViewById(R.id.tvMotivation);
+        progressDaily = findViewById(R.id.progressDaily);
         rvLearningCategories = findViewById(R.id.rvLearningCategories);
-        fabChat = findViewById(R.id.fabChat);
     }
 
     /**
      * Thiết lập dữ liệu tiến độ học tập
      */
     private void setupProgressData() {
-        tvLessonsCompleted.setText(getString(R.string.lessons_completed, completedLessons));
-        // Daily status text
+        // Update daily progress display
         if (dailyGoalTarget <= 0) {
-            tvDailyStatus.setText(getString(R.string.no_daily_goal_set));
+            tvDailyProgress.setText("0/5");
+            progressDaily.setProgress(0);
+            tvMotivation.setText(getString(R.string.motivation_start));
         } else {
+            tvDailyProgress.setText(dailyCompletedToday + "/" + dailyGoalTarget);
+            int progressPercent = (int) ((dailyCompletedToday * 100.0) / dailyGoalTarget);
+            progressDaily.setProgress(Math.min(progressPercent, 100));
+            
             if (dailyCompletedToday >= dailyGoalTarget) {
-                tvDailyStatus.setText(getString(R.string.daily_goal_reached, dailyCompletedToday, dailyGoalTarget));
+                tvMotivation.setText(getString(R.string.motivation_done));
+            } else if (dailyCompletedToday > 0) {
+                tvMotivation.setText(getString(R.string.motivation_progress));
             } else {
-                tvDailyStatus.setText(getString(R.string.daily_progress, dailyCompletedToday, dailyGoalTarget));
+                tvMotivation.setText(getString(R.string.motivation_start));
             }
         }
     }
@@ -259,14 +268,14 @@ public class HomeActivity extends AppCompatActivity {
      * Thiết lập các sự kiện click
      */
     private void setupClickListeners() {
-        // Nút Tài khoản - mở ProfileActivity
-        btnAccount.setOnClickListener(v -> {
+        // User Avatar - open ProfileActivity
+        cardUserAvatar.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
 
-        // Floating Action Button - mở Chat
-        fabChat.setOnClickListener(v -> {
+        // FAB AI Chat
+        fabChatAI.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ChatActivity.class);
             startActivity(intent);
         });

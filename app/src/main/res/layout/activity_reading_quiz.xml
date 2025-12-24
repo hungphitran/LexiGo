@@ -117,7 +117,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardElevation="16dp"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.TopRounded"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.LexiGo.TopRounded"
         app:cardBackgroundColor="@android:color/white">
 
         <LinearLayout

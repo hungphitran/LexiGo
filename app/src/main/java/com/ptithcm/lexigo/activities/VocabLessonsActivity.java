@@ -60,6 +60,12 @@ public class VocabLessonsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_vocab_lessons);
         progressBar = findViewById(R.id.progress_bar);
         
+        // Setup toolbar back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+        
         apiService = ApiClient.getInstance(this).getApiService();
     }
     
