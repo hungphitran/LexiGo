@@ -2,157 +2,163 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-
-    android:background="#F5F5F5">
+    android:background="@android:color/transparent"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="40dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp">
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingTop="@dimen/spacing_md"
+        android:paddingBottom="@dimen/spacing_lg">
 
+        <!-- Header Text -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/create_account"
-            android:textSize="28sp"
-            android:textColor="@color/text_primary"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:textAppearance="@style/TextAppearance.LexiGo.Headline"
+            android:textColor="@color/primary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Điền thông tin để bắt đầu hành trình học tập"
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:text="@string/register_subtitle"
+            android:textAppearance="@style/TextAppearance.LexiGo.Body"
+            android:textColor="@color/text_secondary"/>
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- Full Name Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.LexiGo.TextInputLayout.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:hint="@string/full_name"
+            app:startIconDrawable="@drawable/ic_profile"
+            app:startIconTint="@color/primary"
+            app:boxBackgroundColor="@color/surface_variant"
+            app:boxCornerRadiusTopStart="@dimen/radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/radius_md"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_md">
 
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="@android:color/white">
-
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRegisterFullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:fontFamily="@font/font_nunito"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="@string/full_name_hint"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces"
-                    app:startIconTint="@color/primary"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp">
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etRegisterFullName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName"
-                        android:maxLines="1"/>
+        <!-- Email Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.LexiGo.TextInputLayout.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:hint="@string/email"
+            app:startIconDrawable="@drawable/ic_email"
+            app:startIconTint="@color/primary"
+            app:boxBackgroundColor="@color/surface_variant"
+            app:boxCornerRadiusTopStart="@dimen/radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/radius_md"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_md">
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRegisterEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:fontFamily="@font/font_nunito"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="@string/email_hint"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@android:drawable/ic_dialog_email"
-                    app:startIconTint="@color/primary"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp">
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etRegisterEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"/>
+        <!-- Password Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.LexiGo.TextInputLayout.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:hint="@string/password"
+            app:startIconDrawable="@drawable/ic_lock"
+            app:startIconTint="@color/primary"
+            app:endIconMode="password_toggle"
+            app:boxBackgroundColor="@color/surface_variant"
+            app:boxCornerRadiusTopStart="@dimen/radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/radius_md"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_md">
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRegisterPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:fontFamily="@font/font_nunito"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@android:drawable/ic_lock_lock"
-                    app:startIconTint="@color/primary"
-                    app:endIconMode="password_toggle"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp">
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etRegisterPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/password_hint"
-                        android:inputType="textPassword"
-                        android:maxLines="1"/>
+        <!-- Confirm Password Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.LexiGo.TextInputLayout.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:hint="@string/confirm_password"
+            app:startIconDrawable="@drawable/ic_lock"
+            app:startIconTint="@color/primary"
+            app:endIconMode="password_toggle"
+            app:boxBackgroundColor="@color/surface_variant"
+            app:boxCornerRadiusTopStart="@dimen/radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/radius_md"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_md">
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRegisterConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:fontFamily="@font/font_nunito"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@android:drawable/ic_lock_lock"
-                    app:startIconTint="@color/primary"
-                    app:endIconMode="password_toggle"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp">
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etRegisterConfirmPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/confirm_password"
-                        android:inputType="textPassword"
-                        android:maxLines="1"/>
+        <!-- Terms Checkbox -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbTerms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:text="@string/agree_terms"
+            android:textAppearance="@style/TextAppearance.LexiGo.BodySmall"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="@font/font_nunito"
+            app:buttonTint="@color/primary"/>
 
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRegister"
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:text="@string/register_button"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    app:backgroundTint="@color/accent"
-
-                    android:elevation="6dp"
-                    android:stateListAnimator="@null"/>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        <!-- Register Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_lg"
+            android:text="@string/register_button"
+            android:textSize="@dimen/text_body"
+            android:fontFamily="@font/nunito_bold"
+            app:cornerRadius="@dimen/radius_lg"
+            app:backgroundTint="@color/primary"
+            android:elevation="@dimen/elevation_md"/>
 
     </LinearLayout>
 

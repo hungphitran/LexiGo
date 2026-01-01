@@ -18,16 +18,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LexiGo">
 
-        <!-- Auth Activity - Launcher -->
+        <!-- Splash Activity - Launcher -->
         <activity
-            android:name=".activities.AuthActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.LexiGo.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Auth Activity -->
+        <activity
+            android:name=".activities.AuthActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <!-- Home Activity -->
         <activity

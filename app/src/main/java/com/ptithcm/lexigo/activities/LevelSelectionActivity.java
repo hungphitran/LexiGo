@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.google.android.material.appbar.MaterialToolbar;
+import androidx.appcompat.widget.Toolbar;
 import com.ptithcm.lexigo.R;
 
 /**
@@ -15,7 +15,7 @@ import com.ptithcm.lexigo.R;
  */
 public class LevelSelectionActivity extends AppCompatActivity {
 
-    private MaterialToolbar toolbar;
+    private Toolbar toolbar;
     private CardView cardBeginner, cardIntermediate, cardAdvanced;
 
     @Override

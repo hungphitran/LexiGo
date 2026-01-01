@@ -5,10 +5,7 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    android:elevation="4dp"
-    app:navigationIcon="@android:drawable/ic_menu_revert"
-    app:titleTextColor="@android:color/white"
-    app:title="LexiGo"
-    style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+    style="@style/Widget.LexiGo.Toolbar"
+    app:navigationIcon="@drawable/ic_back"
+    app:title="LexiGo" />
 

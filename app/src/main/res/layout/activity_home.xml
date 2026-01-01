@@ -8,186 +8,324 @@
     android:background="@color/background"
     tools:context=".activities.HomeActivity">
 
-    <!-- App Bar Layout với thanh tiêu đề -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Logo -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    app:cardCornerRadius="50dp"
-                    app:cardElevation="2dp">
-
-                    <ImageView
-                        android:id="@+id/imgLogo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/lexigo_logo"
-                        android:contentDescription="@string/app_name"
-                        android:scaleType="centerInside"/>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/spacing_small"
-                    android:text="@string/app_name"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_large"
-                    android:textStyle="bold"/>
-
-                <!-- Nút Tài khoản -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAccount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/spacing_small"
-                    android:text="@string/account"
-                    android:textColor="@color/white"
-                    app:icon="@drawable/ic_account_custom"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    app:iconTint="@color/white"
-                    style="@style/Widget.Material3.Button.TextButton"/>
-
-            </LinearLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Nội dung chính -->
+    <!-- NestedScrollView for entire content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:clipToPadding="false"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_medium">
+            android:orientation="vertical">
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Header Section with gradient -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_gradient_primary"
+                android:paddingTop="@dimen/spacing_lg"
+                android:paddingBottom="@dimen/spacing_xxl"
+                android:paddingHorizontal="@dimen/spacing_md">
 
-                android:layout_margin="@dimen/spacing_medium"
-                app:cardElevation="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@android:color/white"
+                <!-- Top Row: Logo + User Avatar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
 
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
+                    <!-- Logo -->
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/lexigo_logo"
+                        android:contentDescription="@string/app_name"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_sm"
+                        android:text="@string/app_name"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/nunito_bold"
+                        android:textColor="@color/on_primary"/>
+
+                    <!-- User Avatar -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardUserAvatar"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="@dimen/elevation_sm"
+                        app:cardBackgroundColor="@color/surface"
+                        app:strokeWidth="2dp"
+                        app:strokeColor="@color/surface"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/imgUserAvatar"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_profile"
+                            android:scaleType="centerCrop"
+                            android:padding="10dp"
+                            app:tint="@color/primary"
+                            android:contentDescription="@string/account"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <!-- Greeting -->
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/greeting_morning"
+                    android:textSize="@dimen/text_title"
+                    android:fontFamily="@font/font_nunito"
+                    android:textColor="@color/on_primary"
+                    android:alpha="0.9"/>
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Học viên"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/nunito_bold"
+                    android:textColor="@color/on_primary"/>
+
+                <!-- Quick Stats Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/spacing_lg">
+
+                    <!-- Streak Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/spacing_sm"
+                        app:cardCornerRadius="@dimen/radius_lg"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#40FFFFFF">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/spacing_md"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔥"
+                                android:textSize="24sp"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginStart="@dimen/spacing_sm">
+
+                                <TextView
+                                    android:id="@+id/tvStreak"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/nunito_bold"
+                                    android:textColor="@color/on_primary"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/streak_days"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/font_nunito"
+                                    android:textColor="@color/on_primary"
+                                    android:alpha="0.8"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- XP Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_sm"
+                        app:cardCornerRadius="@dimen/radius_lg"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#40FFFFFF">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/spacing_md"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⭐"
+                                android:textSize="24sp"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginStart="@dimen/spacing_sm">
+
+                                <TextView
+                                    android:id="@+id/tvXP"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/nunito_bold"
+                                    android:textColor="@color/on_primary"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/total_xp"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/font_nunito"
+                                    android:textColor="@color/on_primary"
+                                    android:alpha="0.8"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Daily Goal Card (overlapping) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDailyGoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_md"
+                android:layout_marginTop="-40dp"
+                app:cardCornerRadius="@dimen/radius_xl"
+                app:cardElevation="@dimen/elevation_lg"
+                app:cardBackgroundColor="@color/surface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="@dimen/spacing_md">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:gravity="center_vertical">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/progress_title"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"/>
+                            android:text="@string/daily_goal_title"
+                            android:textAppearance="@style/TextAppearance.LexiGo.TitleSmall"/>
+
+                        <TextView
+                            android:id="@+id/tvDailyProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0/5"
+                            android:textAppearance="@style/TextAppearance.LexiGo.Title"
+                            android:textColor="@color/primary"/>
 
                     </LinearLayout>
 
-                    <LinearLayout
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressDaily"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        app:trackThickness="8dp"
+                        app:trackCornerRadius="4dp"
+                        app:indicatorColor="@color/secondary"
+                        app:trackColor="@color/surface_variant"
+                        android:progress="0"
+                        android:max="100"/>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Đã học"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary"/>
-
-                            <TextView
-                                android:id="@+id/tvLessonsCompleted"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 bài"
-                                android:textSize="14sp"
-                                android:textColor="@color/text_primary"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:id="@+id/tvDailyStatus"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Tiến độ ngày: 0/0 bài"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary"/>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvMotivation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:text="@string/motivation_start"
+                        android:textAppearance="@style/TextAppearance.LexiGo.BodySmall"
+                        android:textColor="@color/text_secondary"/>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- RecyclerView cho các mục chính -->
+            <!-- Continue Learning Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:layout_marginBottom="@dimen/spacing_sm"
+                android:text="@string/continue_learning"
+                android:textAppearance="@style/TextAppearance.LexiGo.TitleSmall"/>
+
+            <!-- Learning Categories Grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvLearningCategories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:paddingBottom="@dimen/spacing_xl"
                 android:clipToPadding="false"
-                tools:listitem="@layout/item_learning_category"/>
+                android:nestedScrollingEnabled="false"
+                android:layoutAnimation="@anim/layout_animation_fall_down"
+                tools:listitem="@layout/item_category_card"/>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Action Button cho Chat -->
+    <!-- AI Chat Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabChat"
+        android:id="@+id/fabChatAI"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/spacing_medium"
-        android:contentDescription="Chat"
-        android:src="@android:drawable/ic_menu_send"
-        app:tint="@color/white"
-        app:backgroundTint="@color/accent"/>
+        android:layout_margin="@dimen/spacing_lg"
+        android:contentDescription="@string/chat_ai"
+        app:srcCompat="@drawable/ic_robot"
+        app:tint="@color/on_primary"
+        app:backgroundTint="@color/primary"
+        app:elevation="@dimen/elevation_lg"
+        app:fabSize="normal"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

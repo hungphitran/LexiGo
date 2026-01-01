@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.ptithcm.lexigo.R;
 import com.ptithcm.lexigo.api.ApiClient;
@@ -39,7 +39,7 @@ public class ListeningExerciseActivity extends AppCompatActivity {
     private static final String TAG = "ListeningExercise";
     private static final int MAX_EXERCISES = 10; // Tối đa 10 câu hỏi
 
-    private MaterialToolbar toolbar;
+    private Toolbar toolbar;
     private TextView tvLevel, tvScriptWithBlank, tvResult;
     private EditText etAnswer;
     private MaterialButton btnPlayAudio, btnSubmit, btnNext, btnHome;

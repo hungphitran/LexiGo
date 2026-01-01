@@ -3,7 +3,7 @@ package com.ptithcm.lexigo.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -36,7 +36,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView rvChat;
     private EditText etMessage;
-    private ImageButton btnSend;
+    private FloatingActionButton btnSend;
     private ProgressBar progressBar;
     private ChatMessageAdapter adapter;
     private List<ChatMessage> messages;
@@ -56,9 +56,11 @@ public class ChatActivity extends AppCompatActivity {
 
         btnSend.setOnClickListener(v -> sendMessage());
         
-        // Setup header back button
-        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.header);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        // Setup toolbar back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        }
     }
 
     private void initViews() {

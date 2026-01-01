@@ -65,7 +65,7 @@ public class ReadingPassagesActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
-        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 

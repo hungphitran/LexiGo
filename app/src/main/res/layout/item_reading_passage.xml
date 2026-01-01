@@ -3,35 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.LexiGo.Card.Interactive"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
-
-    app:strokeColor="#F0F0F0"
-    app:strokeWidth="1dp"
-    app:cardBackgroundColor="@android:color/white"
-
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:layout_marginHorizontal="@dimen/spacing_sm"
+    android:layout_marginVertical="@dimen/spacing_xs">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="@dimen/spacing_sm"
         android:gravity="center_vertical">
 
+        <!-- Thumbnail -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="80dp"
+            android:layout_width="@dimen/avatar_lg"
             android:layout_height="100dp"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="@dimen/radius_sm"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#F5F5F5">
+            app:cardBackgroundColor="@color/reading_surface"
+            app:strokeWidth="0dp">
 
             <ImageView
                 android:id="@+id/ivPassageThumbnail"
@@ -39,86 +31,76 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery"
-                tools:src="@tools:sample/avatars" />
+                tools:src="@tools:sample/avatars"/>
+
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Text Content -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/spacing_md"
             android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Level Badge -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/tvPassageLevel"
+                style="@style/Widget.LexiGo.Chip.Reading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:text="@string/beginner"
+                android:textSize="@dimen/text_caption"
+                app:chipMinHeight="24dp"
+                android:layout_marginBottom="@dimen/spacing_xs"/>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="4dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="#E3F2FD"> <TextView
-                    android:id="@+id/tvPassageLevel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Beginner"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary"
-                    android:textAllCaps="true"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="3dp"/>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
+            <!-- Title -->
             <TextView
                 android:id="@+id/tvPassageTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
+                android:textAppearance="@style/TextAppearance.LexiGo.TitleSmall"
                 android:maxLines="2"
                 android:ellipsize="end"
-                tools:text="The Great Adventure of Sherlock Holmes" />
+                tools:text="The Great Adventure of Sherlock Holmes"/>
 
+            <!-- Tags/Meta -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="8dp"
-                android:alpha="0.7">
+                android:layout_marginTop="@dimen/spacing_sm">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="@dimen/icon_size_xs"
+                    android:layout_height="@dimen/icon_size_xs"
                     android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="@android:color/darker_gray"
-                    android:layout_marginEnd="4dp"/>
+                    android:layout_marginEnd="@dimen/spacing_xs"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary"/>
 
                 <TextView
                     android:id="@+id/tvPassageTags"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"
+                    android:textAppearance="@style/TextAppearance.LexiGo.Caption"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    tools:text="Fiction, Adventure, 500 words" />
+                    tools:text="Fiction, Adventure, 500 words"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Arrow Icon -->
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/icon_size_sm"
+            android:layout_height="@dimen/icon_size_sm"
             android:src="@drawable/outline_right"
-            app:tint="#BDBDBD"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:contentDescription="@null"
+            app:tint="@color/text_hint"/>
 
     </LinearLayout>
 
