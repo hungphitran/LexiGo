@@ -1,5 +1,6 @@
 package com.ptithcm.lexigo.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,9 +77,10 @@ public class ReadingPassageAdapter extends RecyclerView.Adapter<ReadingPassageAd
         TextView tvLevel;
         TextView tvTags;
 
+        @SuppressLint("ResourceType")
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivThumbnail = itemView.findViewById(R.id.ivPassageThumbnail);
+            ivThumbnail = itemView.findViewById(R.drawable.lexigo_logo);
             tvTitle = itemView.findViewById(R.id.tvPassageTitle);
             tvLevel = itemView.findViewById(R.id.tvPassageLevel);
             tvTags = itemView.findViewById(R.id.tvPassageTags);

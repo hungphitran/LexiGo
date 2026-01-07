@@ -1,5 +1,6 @@
 package com.ptithcm.lexigo.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
@@ -124,9 +125,11 @@ public class VocabLessonAdapter extends RecyclerView.Adapter<VocabLessonAdapter.
         ImageButton btnPlayAudio;
         TextView tvWord, tvPronunciation, tvMeaning, tvExample;
         
+        @SuppressLint("ResourceType")
         ViewHolder(View itemView) {
             super(itemView);
-            ivImage = itemView.findViewById(R.id.iv_word_image);
+            ivImage = itemView.findViewById(R.drawable
+                    .lexigo_logo);
             btnPlayAudio = itemView.findViewById(R.id.btn_play_audio);
             tvWord = itemView.findViewById(R.id.tv_word);
             tvPronunciation = itemView.findViewById(R.id.tv_pronunciation);

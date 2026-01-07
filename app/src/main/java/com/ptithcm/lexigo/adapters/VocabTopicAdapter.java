@@ -1,5 +1,6 @@
 package com.ptithcm.lexigo.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,9 +88,10 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
         TextView tvName, tvDescription, tvLevel, tvWordCount;
         Button btnStartQuiz;
 
+        @SuppressLint("ResourceType")
         ViewHolder(View itemView) {
             super(itemView);
-            ivIcon = itemView.findViewById(R.id.iv_topic_icon);
+            ivIcon = itemView.findViewById(R.drawable.lexigo_logo);
             tvName = itemView.findViewById(R.id.tv_topic_name);
             tvDescription = itemView.findViewById(R.id.tv_topic_description);
             tvLevel = itemView.findViewById(R.id.tv_topic_level);

@@ -29,10 +29,8 @@
                 android:id="@+id/iv_lesson_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="@dimen/spacing_md"
-                android:src="@drawable/ic_menu_book"
-                android:scaleType="centerInside"
-                app:tint="@color/grammar_primary"/>
+                android:src="@drawable/lexigo_logo"
+                android:scaleType="centerInside" />
 
         </com.google.android.material.card.MaterialCardView>
 

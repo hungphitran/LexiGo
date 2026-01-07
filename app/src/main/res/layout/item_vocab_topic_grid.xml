@@ -24,8 +24,8 @@
 
         <!-- Icon Container -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             app:cardCornerRadius="30dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="#E1F5FE"
@@ -35,11 +35,8 @@
                 android:id="@+id/iv_topic_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="12dp"
-                android:src="@mipmap/ic_launcher"
-                app:tint="@color/primary"
-                android:scaleType="centerCrop"
-                tools:src="@android:drawable/ic_menu_compass" />
+                android:src="@drawable/lexigo_logo"
+                android:scaleType="centerCrop" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Topic Name -->

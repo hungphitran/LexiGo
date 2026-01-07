@@ -348,6 +348,7 @@ public class DictionaryActivity extends AppCompatActivity {
                 Toast.makeText(DictionaryActivity.this, "Đang phát âm...", Toast.LENGTH_SHORT).show();
             });
 
+
             mediaPlayer.setOnCompletionListener(mp -> releaseMediaPlayer());
 
             mediaPlayer.setOnErrorListener((mp, what, extra) -> {
